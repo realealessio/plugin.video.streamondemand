@@ -390,7 +390,7 @@ class Tvdb:
                 buscando = kwargs.get('tvdb_id', '')
             else:
                 buscando = kwargs.get('search', '')
-            msg = "La busqueda de %s no dio resultados." % buscando
+            msg = "La ricerca di %s non ha dato risultati." % buscando
             logger.debug(msg)
 
     @classmethod
