@@ -128,6 +128,7 @@ def getchanneltypes(preferred_thumb=""):
     itemlist.append(Item(title="Saghe", channel="saghe", action="mainlist",
                          category="saghe", channel_type="saghe", thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "cat_menu_saghe.png")))
     itemlist.append( Item(title="Oggi in TV" , channel="filmontv" , action="mainlist" , thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_filmontv.png"),viewmode="movie") )
+    itemlist.append( Item(title="Liste Netflix" , channel="netflixsrc" , action="mainlist" , thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "cat_menu_series.png"),viewmode="movie") )
     logger.info("channelselector.getchanneltypes Ordenados:")
     for channel_type in valid_types:
         logger.info("channelselector.getchanneltypes channel_type="+channel_type)
