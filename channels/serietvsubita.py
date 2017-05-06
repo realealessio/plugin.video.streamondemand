@@ -171,7 +171,7 @@ def episodiosearch(item):
             Item(channel=__channel__,
                  action="findvideos",
                  fulltitle=scrapedtitle,
-                 show=scrapedtitle,
+                 show=item.show,
                  title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail,
