@@ -80,7 +80,8 @@ def peliculas(item):
     itemlist = []
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
-    patron = r'<a href="([^"]+)".*?>\s*(?:<div class="item\-film\-img">\s*|)<img src="([^"]+)" alt="([^"]+)">'
+    patron = r'<div class="(?:film-item|item-film)">\s*(?:[^>]+>\s*|)<a href="([^"]+)".*?>\s*'
+    patron += r'(?:<div class="item\-film\-img">\s*|)<img src="([^"]+)" alt="([^"]+)">'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
