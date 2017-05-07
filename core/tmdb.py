@@ -729,7 +729,7 @@ class Tmdb(object):
                 pass
 
             if "status_code" in resultado:
-                msg = "Error de tmdb: %s %s" % (resultado["status_code"], resultado["status_message"])
+                msg = "Errore di tmdb: %s %s" % (resultado["status_code"], resultado["status_message"])
                 logger.error(msg)
 
     def __by_id(self, source='tmdb'):
@@ -836,7 +836,7 @@ class Tmdb(object):
             # No hay resultados de la busqueda
             msg = "Nessun risultato della ricerca '%s' per la pagina %s" % (buscando, page)
             if "status_code" in resultado:
-                msg += "\nError de tmdb: %s %s" % (resultado["status_code"], resultado["status_message"])
+                msg += "\nError d1 tmdb: %s %s" % (resultado["status_code"], resultado["status_message"])
             logger.error(msg)
             return 0
 
@@ -1032,7 +1032,7 @@ class Tmdb(object):
                     ret = self.result['overview']
 
                 if "status_code" in resultado:
-                    msg = "Error di tmdb: %s %s" % (resultado["status_code"], resultado["status_message"])
+                    msg = "Errore di tmdb: %s %s" % (resultado["status_code"], resultado["status_message"])
                     logger.debug(msg)
 
         return ret
@@ -1297,7 +1297,7 @@ class Tmdb(object):
                     self.result["videos"].extend(dict_videos['results'])
 
             if "status_code" in dict_videos:
-                msg = "Error de tmdb: %s %s" % (dict_videos["status_code"], dict_videos["status_message"])
+                msg = "Errore di tmdb: %s %s" % (dict_videos["status_code"], dict_videos["status_message"])
                 logger.debug(msg)
 
             # Si las busqueda han obtenido resultados devolver un listado de objetos
