@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<channel>
+    <id>filmstreamingita</id>
+    <name>FilmStreamingIta</name>
+
+    <active>true</active>
+    <adult>false</adult>
+    <language>it</language>
+
+    <thumbnail>http://filmstreamingita.info/wp-content/uploads/2016/02/logo1.png</thumbnail>
+    <bannermenu>http://filmstreamingita.info/wp-content/uploads/2016/02/logo1.png</bannermenu>
+
+    <update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
+    <version>1</version>
+    <date>07/05/2017</date>
+    <changes>Versione iniziale</changes>
+
+    <categories>
+        <category>movie</category>
+    </categories>
+
+ 	<settings>
+		<id>include_in_global_search</id>
+		<type>bool</type>
+		<label>Includi ricerca globale</label>
+		<default>true</default>
+		<enabled>true</enabled>
+		<visible>true</visible>
+	</settings>
+</channel>
