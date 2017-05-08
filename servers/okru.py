@@ -25,7 +25,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     page_url = page_url.split('|')
     headers.append(['Referer', page_url[1]])
 
-    data = scrapertools.cache_page(page_url[0], headers=headers)
+    page_url[0] = page_url[0].split('?')
+    data = scrapertools.cache_page(page_url[0][0], post=page_url[0][1], headers=headers)
 
     _headers = urllib.urlencode(dict(headers))
 
