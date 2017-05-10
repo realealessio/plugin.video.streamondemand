@@ -56,7 +56,7 @@ def find_videos(data):
             logger.info("  url duplicada=" + url)
 
 
-    patronvideos = r"""http://megadrive.tv/(?:embed-|)([a-z0-9A-Z]+)"""
+    patronvideos = r""".*?megadrive.tv/(?:embed-|)([a-z0-9A-Z]+)"""
     logger.info("[megadrive.py] find_videos #" + patronvideos + "#")
     matches = re.compile(patronvideos, re.DOTALL).findall(data)
 
