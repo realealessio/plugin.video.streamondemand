@@ -7,6 +7,7 @@ import Queue
 import glob
 import os
 import re
+import threading
 import time
 import urllib
 from threading import Thread
@@ -23,6 +24,7 @@ logger.info("streamondemand.channels.buscador init")
 DEBUG = config.get_setting("debug")
 
 TIMEOUT_TOTAL = 75
+MAX_THREADS = 16
 
 
 def mainlist(item, preferred_thumbnail="squares"):
@@ -206,7 +208,10 @@ def do_search(item):
     channel_files = sorted(glob.glob(channels_path))
 
     number_of_channels = 0
+    completed_channels = 0
     search_results = Queue.Queue()
+
+    start_time = int(time.time())
 
     for infile in channel_files:
 
@@ -246,9 +251,27 @@ def do_search(item):
         t.start()
         number_of_channels += 1
 
-    start_time = int(time.time())
+        while threading.active_count() >= MAX_THREADS:
+            delta_time = int(time.time()) - start_time
+            if len(itemlist) <= 0:
+                timeout = None  # No result so far,lets the thread to continue working until a result is returned
+            elif delta_time >= TIMEOUT_TOTAL:
+                progreso.close()
+                itemlist = sorted(itemlist, key=lambda item: item.fulltitle)
+                return itemlist
+            else:
+                timeout = TIMEOUT_TOTAL - delta_time  # Still time to gather other results
 
-    completed_channels = 0
+            progreso.update(completed_channels * 100 / number_of_channels)
+
+            try:
+                itemlist.extend(search_results.get(timeout=timeout))
+                completed_channels += 1
+            except:
+                progreso.close()
+                itemlist = sorted(itemlist, key=lambda item: item.fulltitle)
+                return itemlist
+
     while completed_channels < number_of_channels:
 
         delta_time = int(time.time()) - start_time

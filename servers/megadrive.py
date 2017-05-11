@@ -39,24 +39,7 @@ def find_videos(data):
     encontrados = set()
     devuelve = []
 
-
-    patronvideos = r"""http://megadrive.tv/embed/([a-z0-9A-Z]+)"""
-    logger.info("[megadrive.py] find_videos #" + patronvideos + "#")
-    matches = re.compile(patronvideos, re.DOTALL).findall(data)
-
-    for match in matches:
-        titulo = "[megadrive]"
-        url = 'http://megadrive.tv/embed/%s' % match
-
-        if url not in encontrados:
-            logger.info("  url=" + url)
-            devuelve.append([titulo, url, 'megadrive'])
-            encontrados.add(url)
-        else:
-            logger.info("  url duplicada=" + url)
-
-
-    patronvideos = r""".*?megadrive.tv/(?:embed-|)([a-z0-9A-Z]+)"""
+    patronvideos = r"""(?://|\.)megadrive\.tv/(?:embed(?:-|/))?([a-z0-9A-Z]+)"""
     logger.info("[megadrive.py] find_videos #" + patronvideos + "#")
     matches = re.compile(patronvideos, re.DOTALL).findall(data)
 

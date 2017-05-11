@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
 # streamondemand - XBMC Plugin
-# Conector para flashx by cmos
+# Conector para flashx
 # http://blog.tvalacarta.info/plugin-xbmc/pelisalacarta/
 # ------------------------------------------------------------
 
@@ -23,10 +23,10 @@ def test_video_exists(page_url):
 
     data = httptools.downloadpage(page_url, cookies=False).data
 
-    if 'File Not Found' in data:
-        return False, "[FlashX] Nessun file"
+    if 'File Not Found' in data or 'file was deleted' in data:
+        return False, "[FlashX] File non presente"
     elif 'Video is processing now' in data:
-        return False, "[FlashX] File processato"
+        return False, "[FlashX] File in processo"
 
     return True, ""
 
@@ -47,7 +47,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             pass
 
     matches = scrapertools.find_multiple_matches(data, "<script type='text/javascript'>(.*?)</script>")
-    m = ""
     for n, m in enumerate(matches):
         if m.startswith("eval"):
             try:
@@ -80,7 +79,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         headers['Referer'] = "https://www.flashx.tv/"
         headers['Accept'] = "*/*"
         coding = httptools.downloadpage(coding_url, headers=headers, replace_headers=True).data
-
+        
         coding_url = 'https://www.flashx.tv/counter.cgi?fx=%s' % base64.encodestring(file_id)
         headers['Host'] = "www.flashx.tv"
         coding = httptools.downloadpage(coding_url, headers=headers, replace_headers=True).data
@@ -128,8 +127,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                 filetools.write(subtitle, data)
             except:
                 import traceback
-                logger.info("pelisalacarta.servers.flashx Error al descargar el subtítulo: "+traceback.format_exc())
-
+                logger.info("streamondemand.servers.flashx Error al descargar el subtítulo: "+traceback.format_exc())
+            
     for media_url, label in media_urls:
         if not media_url.endswith("png") and not media_url.endswith(".srt"):
             video_urls.append(["." + media_url.rsplit('.', 1)[1] + " [flashx]", media_url, 0, subtitle])
@@ -148,7 +147,7 @@ def find_videos(data):
 
     # http://flashx.tv/z3nnqbspjyne
     # http://www.flashx.tv/embed-li5ydvxhg514.html
-    patronvideos = 'flashx.(?:tv|pw|to)/(?:embed.php\?c=|embed-|playvid-|)([A-z0-9]+)'
+    patronvideos = 'flashx.(?:tv|pw)/(?:embed.php\?c=|embed-|playvid-|)([A-z0-9]+)'
     logger.info("#" + patronvideos + "#")
     matches = re.compile(patronvideos, re.DOTALL).findall(data)
 

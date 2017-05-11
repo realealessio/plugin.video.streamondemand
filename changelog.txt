@@ -1,3 +1,8 @@
+v5.5.2
+- update channels and servers process
+- new channels
+- small general fixes
+
 v5.5.1
 - global search, update channels/server fix... perhaps :-)
 - minor release

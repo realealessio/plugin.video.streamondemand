@@ -12,6 +12,7 @@ import urllib
 from core import logger
 from core import scrapertools
 
+
 # Prendo l'url del video dal sito
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.info("[cloudifer.py] url=" + page_url)
@@ -21,7 +22,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     html = scrapertools.cache_page(page_url, headers=headers)
     match = re.search(r'file: "([^"]+)",', html, re.DOTALL)
-    video_urls.append(["Cloudifer", match.group(1) + "|" + urllib.urlencode(dict(headers))])
+    video_urls.append(["Cloudifer", match.group(1) + "|" + urllib.urlencode(headers)])
 
     return video_urls
 
@@ -33,7 +34,7 @@ def find_videos(text):
 
     # https://cloudifer.net/embed/1N2F
     # https://cloudifer.net/480
-    patronvideos = r'.*?cloudifer.\w+/(?:embed/|)([a-zA-Z0-9]+)'
+    patronvideos = r'(?://|\.)cloudifer.\w+/(?:embed/)?([a-zA-Z0-9]+)'
     logger.info("[cloudifer.py] find_videos #" + patronvideos + "#")
     matches = re.compile(patronvideos, re.DOTALL).findall(text)
 
