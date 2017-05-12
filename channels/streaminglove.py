@@ -44,6 +44,16 @@ def mainlist(item):
                      url="%s/film/" % host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
+                     title="[COLOR azure]Cinema[/COLOR]",
+                     action="peliculas",
+                     url="%s/genere/cinema/" % host,
+                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
+                Item(channel=__channel__,
+                     title="[COLOR azure]Sub ITA[/COLOR]",
+                     action="peliculas",
+                     url="%s/genere/sub-ita/" % host,
+                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
+                Item(channel=__channel__,
                      title="[COLOR azure]Film Per Categoria[/COLOR]",
                      action="categorias",
                      url=host,
@@ -64,7 +74,7 @@ def categorias(item):
     bloque = scrapertools.get_match(data, '<ul class="genres scrolling">(.*?)</ul>')
 
     # Extrae las entradas (carpetas)
-    patron = '<li[^>]+><a href="(.*?)"[^>]+>(.*?)</a>'
+    patron = '<li[^>]+><a href="([^"]+)">(.*?)</a>'
     matches = re.compile(patron, re.DOTALL).findall(bloque)
 
     for scrapedurl, scrapedtitle in matches:
@@ -152,7 +162,7 @@ def peliculas(item):
                  folder=True), tipo='movie'))
 
     # Extrae el paginador
-    patronvideos = '<link rel=\'next\' href=\'(.*?)\' />'
+    patronvideos = '<link rel=\'next\' href=\'([^\']+)\'/>'
     matches = re.compile(patronvideos, re.DOTALL).findall(data)
 
     if len(matches) > 0:
