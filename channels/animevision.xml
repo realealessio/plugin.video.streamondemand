@@ -8,17 +8,16 @@
 	<language>it</language>
 
 	<fanart></fanart>
-	<thumbnail>http://animevision.altervista.org/images/logo.png</thumbnail>
-	<bannermenu>http://animevision.altervista.org/images/logo.png</bannermenu>
+	<thumbnail>http://animevision.it/images/logo.png</thumbnail>
+	<bannermenu>http://animevision.it/images/logo.png</bannermenu>
 
 	<update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-	<version>2</version>
-	<date>15/09/2016</date>
-	<changes>new channel</changes>
+	<version>3</version>
+	<date>12/05/2017</date>
+	<changes>Small Fix</changes>
 
 	<categories>
 		<category>anime</category>
-
 	</categories>
 
 	<settings>
