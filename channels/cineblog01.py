@@ -452,10 +452,15 @@ def findvid_film(item):
     for match in matches:
         QualityStr = scrapertools.unescape(match.group(1))[6:]
 
+    # STREAMANGO
+    matches = []
+    u = scrapertools.find_single_match(data, '(?://|\.)streamango\.com/(?:f/|embed/)?[0-9a-zA-Z]+')
+    if u: matches.append((u, 'Streamango'))
+
     # Extrae las entradas
     streaming = scrapertools.find_single_match(data, '<strong>Streaming:</strong>(.*?)<table height="30">')
     patron = '<td><a[^h]href="([^"]+)"[^>]+>([^<]+)<'
-    matches = re.compile(patron, re.DOTALL).findall(streaming)
+    matches = re.compile(patron, re.DOTALL).findall(streaming) + matches
     for scrapedurl, scrapedtitle in matches:
         logger.debug("##### findvideos Streaming ## %s ## %s ##" % (scrapedurl, scrapedtitle))
         title = "[COLOR orange]Streaming:[/COLOR] " + item.title + " [COLOR grey]" + QualityStr + "[/COLOR] [COLOR blue][" + scrapedtitle + "][/COLOR]"
