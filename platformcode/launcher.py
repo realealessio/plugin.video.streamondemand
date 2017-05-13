@@ -92,7 +92,7 @@ def run():
 
                         itemlist = channelselector.getmainlist()
                         itemlist.insert(0, Item(title="Download versione "+version, version=version, channel="updater",
-                                                action="update", thumbnail=channelselector.get_thumb("squares","thumb_actualizar.png")))
+                                                action="update", thumbnail=os.path.join(config.get_runtime_path() , "resources" , "images", "service_update.png")))
                 except:
                     import traceback
                     logger.info(traceback.format_exc())
