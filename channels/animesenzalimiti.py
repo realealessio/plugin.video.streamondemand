@@ -196,7 +196,7 @@ def episodi(item):
     itemlist = []
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
-    blocco = scrapertools.find_single_match(data, r'<p style="text-align: left;">(.*?)</span></a></div>')
+    blocco = scrapertools.find_single_match(data, r'(?:<p style="text-align: left;">|<div class="pagination clearfix">\s*)(.*?)</span></a></div>')
 
     # Il primo episodio è la pagina stessa
     itemlist.append(
