@@ -1,3 +1,10 @@
+v5.5.3
+- mitigated thread in search
+- update on menu
+- new channels
+- new servers
+- small general fixes
+
 v5.5.2
 - update channels and servers process
 - new channels

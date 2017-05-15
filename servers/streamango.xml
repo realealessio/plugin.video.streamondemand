@@ -1,15 +1,14 @@
 <?xml version="1.0" ?>
 <server>
 	<active>true</active>
-	<changes>Fix</changes>
-	<date>20/03/2017</date>
+	<changes>Versión incial</changes>
+	<date>25/03/2016</date>
 	<free>true</free>
-	<id>openload</id>
-	<name>openload</name>
+	<id>streamango</id>
+	<name>streamango</name>
 	<premium>
-		<value>realdebrid</value>
 	</premium>
-	<thumbnail>http://media.tvalacarta.info/servers/server_openload.png</thumbnail>
+	<thumbnail>http://media.tvalacarta.info/servers/server_streamango.png</thumbnail>
 	<update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/servers/</update_url>
-	<version>32</version>
+	<version>1</version>
 </server>

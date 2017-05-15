@@ -452,10 +452,15 @@ def findvid_film(item):
     for match in matches:
         QualityStr = scrapertools.unescape(match.group(1))[6:]
 
+    # STREAMANGO
+    matches = []
+    u = scrapertools.find_single_match(data, '(?://|\.)streamango\.com/(?:f/|embed/)?[0-9a-zA-Z]+')
+    if u: matches.append((u, 'Streamango'))
+
     # Extrae las entradas
     streaming = scrapertools.find_single_match(data, '<strong>Streaming:</strong>(.*?)<table height="30">')
     patron = '<td><a[^h]href="([^"]+)"[^>]+>([^<]+)<'
-    matches = re.compile(patron, re.DOTALL).findall(streaming)
+    matches = re.compile(patron, re.DOTALL).findall(streaming) + matches
     for scrapedurl, scrapedtitle in matches:
         logger.debug("##### findvideos Streaming ## %s ## %s ##" % (scrapedurl, scrapedtitle))
         title = "[COLOR orange]Streaming:[/COLOR] " + item.title + " [COLOR grey]" + QualityStr + "[/COLOR] [COLOR blue][" + scrapedtitle + "][/COLOR]"
@@ -470,7 +475,7 @@ def findvid_film(item):
                  folder=False))
 
     streaming_hd = scrapertools.find_single_match(data, '<strong>Streaming HD[^<]+</strong>(.*?)<table height="30">')
-    patron = '<td><a\s*href="([^"]+)"\s*target="_blank">([^<]+)</a></td>'
+    patron = '<td><a[^h]href="([^"]+)"[^>]+>([^<]+)<'
     matches = re.compile(patron, re.DOTALL).findall(streaming_hd)
     for scrapedurl, scrapedtitle in matches:
         logger.debug("##### findvideos Streaming HD ## %s ## %s ##" % (scrapedurl, scrapedtitle))
@@ -486,7 +491,7 @@ def findvid_film(item):
                  folder=False))
 
     streaming_3D = scrapertools.find_single_match(data, '<strong>Streaming 3D[^<]+</strong>(.*?)<table height="30">')
-    patron = '<td><a\s*href="([^"]+)"\s*target="_blank">([^<]+)</a></td>'
+    patron = '<td><a[^h]href="([^"]+)"[^>]+>([^<]+)<'
     matches = re.compile(patron, re.DOTALL).findall(streaming_3D)
     for scrapedurl, scrapedtitle in matches:
         logger.debug("##### findvideos Streaming 3D ## %s ## %s ##" % (scrapedurl, scrapedtitle))
@@ -502,7 +507,7 @@ def findvid_film(item):
                  folder=False))
 
     download = scrapertools.find_single_match(data, '<strong>Download:</strong>(.*?)<table height="30">')
-    patron = '<td><a\s*href="([^"]+)"\s*target="_blank">([^<]+)</a></td>'
+    patron = '<td><a[^h]href="([^"]+)"[^>]+>([^<]+)<'
     matches = re.compile(patron, re.DOTALL).findall(download)
     for scrapedurl, scrapedtitle in matches:
         logger.debug("##### findvideos Download ## %s ## %s ##" % (scrapedurl, scrapedtitle))
@@ -518,7 +523,7 @@ def findvid_film(item):
                  folder=False))
 
     download_hd = scrapertools.find_single_match(data, '<strong>Download HD[^<]+</strong>(.*?)<table width="100%" height="20">')
-    patron = '<td><a\s*href="([^"]+)"\s*target="_blank">([^<]+)</a></td>'
+    patron = '<td><a[^h]href="([^"]+)"[^>]+>([^<]+)<'
     matches = re.compile(patron, re.DOTALL).findall(download_hd)
     for scrapedurl, scrapedtitle in matches:
         logger.debug("##### findvideos Download HD ## %s ## %s ##" % (scrapedurl, scrapedtitle))

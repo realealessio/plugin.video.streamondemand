@@ -229,14 +229,14 @@ def seasons(item):
         scrapedurl = item.url + scrapedurl
         scrapedplot = ""
         scrapedthumbnail = ""
-        scrapedtitle = "Stagione" + scrapedseason
+        scrapedtitle = item.title 
 
         itemlist.append(
             Item(channel=__channel__,
                  action="episodios",
                  fulltitle=scrapedtitle,
                  show=scrapedtitle,
-                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]" + " " + "Stagione" + scrapedseason,
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail,
                  plot=scrapedplot,
