@@ -36,8 +36,8 @@ def isGeneric():
 def mainlist(item):
     logger.info("[AnimeSenzaLimiti.py]==> mainlist")
     itemlist = [Item(channel=__channel__,
-                     action="animedelgiorno",
-                     title=color("Anime del giorno", "orange"),
+                     action="animepopolari",
+                     title=color("Anime più popolari", "orange"),
                      url=host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
@@ -97,15 +97,16 @@ def categorie(item):
     itemlist = []
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
-    blocco = scrapertools.get_match(data, r'</h4>\s*<ul>(.*?)</ul>\s*</div>')
-    patron = r'<li class="cat-item cat-item-\d+"><a href="([^"]+)" >([^<]+)</a>\s*</li>'
+    blocco = scrapertools.get_match(data, r'</h4><div class="tagcloud">(.*?)</div></aside>')
+    patron = r"<a href='([^']+)'.*?title='([0-9.]+) \w+'[^>]+>([^<]+)</a>"
     matches = re.compile(patron, re.DOTALL).findall(blocco)
 
-    for scrapedurl, scrapedtitle in matches:
+    for scrapedurl, scrapednumber, scrapedtitle in matches:
+        scrapednumber = scrapednumber.replace('.', '')
         itemlist.append(
                 Item(channel=__channel__,
                      action="lista_anime",
-                     title=scrapedtitle,
+                     title="%s (%s)" % (scrapedtitle, color(scrapednumber, "red")),
                      url=scrapedurl,
                      extra="tv",
                      thumbnail=item.thumbnail,
@@ -116,13 +117,13 @@ def categorie(item):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
-def animedelgiorno(item):
-    logger.info("[AnimeSenzaLimiti.py]==> animedelgiorno")
+def animepopolari(item):
+    logger.info("[AnimeSenzaLimiti.py]==> animepopolari")
     itemlist = []
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
-    patron = r'<figure class="mh-custom-posts-thumb">\s*<a href="([^"]+)"'
-    patron += r' title="([^"]+)"><img.*?src="([^?]+)[^"]+".*?/>'
+    blocco = scrapertools.get_match(data, r"<div class='widgets-grid-layout no-grav'>(.*?)</div>\s*</div>\s*</div>")
+    patron = r'<a href="([^"]+)" title="([^"]+)"[^>]+>\s*<img.*?src="([^?]+)[^"]+"[^>]+>'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedurl, scrapedtitle, scrapedthumbnail in matches:
@@ -223,24 +224,6 @@ def episodi(item):
                      thumbnail=item.thumbnail,
                      folder=True))
 
-    patronvideos = r'<a class="next page-numbers" href="([^"]+)">'
-    matches = re.compile(patronvideos, re.DOTALL).findall(data)
-
-    if len(matches) > 0:
-        scrapedurl = matches[0]
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="HomePage",
-                 title=color("Torna Home", "yellow"),
-                 folder=True)),
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="episodi",
-                 title=color("Successivo >>", "orange"),
-                 url=scrapedurl,
-                 thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",
-                 folder=True))
-
     return itemlist
 
 # ================================================================================================================
@@ -253,7 +236,8 @@ def findvideos(item):
     itemlist = servertools.find_video_items(data=data)
 
     for videoitem in itemlist:
-        videoitem.title = "".join([item.title, color(videoitem.title, "orange")])
+        server = re.sub(r'[-\[\]\s]+', '', videoitem.title)
+        videoitem.title = "".join(["[%s] " % color(server, 'orange'), item.title])
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
