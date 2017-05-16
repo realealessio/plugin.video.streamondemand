@@ -21,7 +21,7 @@ def test_video_exists(page_url):
     url_redirect = scrapertools.find_single_match(data, '<iframe src="([^"]+)"')
     data = httptools.downloadpage(url_redirect).data
     if "We're sorry, this video is no longer available" in data:
-        return False, "[Youwatch]  File cancellato"
+        return False, "[Youwatch] File cancellato"
 
     return True, ""
 
@@ -50,7 +50,8 @@ def find_videos(data):
 
     # http://chouhaa.info/embed-ihc21y2tqpnt.html
     # http://youwatch.org/ihc21y2tqpnt
-    patronvideos = 'http://(?:youwatch.org|chouhaa.info)/(?:embed-|)([a-z0-9]+)'
+    # http://youwatch.to/ygzyilxutdge
+    patronvideos = '(?://|\.)(?:youwatch.org|chouhaa.info|voodaith7e.com|youwatch.to)/(?:embed-|)([a-z0-9]+)'
     logger.info("#" + patronvideos + "#")
     matches = re.compile(patronvideos, re.DOTALL).findall(data)
 
