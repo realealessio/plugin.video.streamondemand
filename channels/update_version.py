@@ -25,17 +25,7 @@
 # Channels and Servers update from main menu
 # --------------------------------------------------------------------------------
 
-import os
-import re
-import sys
-import time
-
-from core import config
 from core import logger
-from core import scrapertools
-
-from core.item import Item
-from platformcode import platformtools
 
 
 def update_from_menu(item):
