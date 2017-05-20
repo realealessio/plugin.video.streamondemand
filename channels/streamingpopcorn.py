@@ -41,7 +41,6 @@ def mainlist(item):
 
     return itemlist
 
-
 def peliculas(item):
     logger.info("streamondemand.streamingpopcorn peliculas")
     itemlist = []
