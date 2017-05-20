@@ -34,7 +34,7 @@ from core import config
 from core import updater
 
 DEBUG = config.get_setting("debug")
-MAX_THREADS = 32
+MAX_THREADS = 16
 
 
 # Procedures
