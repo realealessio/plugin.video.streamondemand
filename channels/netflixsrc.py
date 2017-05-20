@@ -63,20 +63,20 @@ def news(item):
     data = scrapertools.cache_page(item.url)
 
     # Extrae las entradas (carpetas)
-    patron = '<li class="[^i]+isotope-item ([^"]+)">\s*<div[^=]+=[^=]+="([^"]+)">\s*<[^<]+<[^>]+>\s*<[^>]+>\s*<[^>]+>\s*<[^>]+>\s*<img src="([^"]+)"'
+    patron = '<li class="[^i]+isotope-item([^"]+)">\s*<div[^=]+=[^=]+="([^"]+)">\s*<[^<]+<[^>]+>\s*<[^>]+>\s*<[^>]+>\s*<[^>]+>\s*<img src="([^"]+)"'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedtype, scrapedtitle, scrapedthumbnail in matches:
         scrapedurl = ""
-        scrapedtv = scrapedtype + " Netflix"
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
         scrapedtitle = scrapedtitle.split("(")[0]
+        scrapedtv = " Netflix"
 
         itemlist.append(
             Item(channel=__channel__,
                  action="do_search",
                  extra=urllib.quote_plus(scrapedtitle) + '{}' + 'serie',
-                 title=scrapedtitle + "[COLOR red]   " + scrapedtv + "[/COLOR]",
+                 title=scrapedtitle + "[COLOR orange]" + scrapedtype + "[/COLOR]" + "[COLOR red]" + scrapedtv + "[/COLOR]",
                  fulltitle=scrapedtitle,
                  url=scrapedurl,
                  thumbnail=scrapedthumbnail,
