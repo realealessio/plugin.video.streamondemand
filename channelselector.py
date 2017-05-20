@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------
-# pelisalacarta 4
+# streamondemand 5
 # Copyright 2015 tvalacarta@gmail.com
 # http://blog.tvalacarta.info/plugin-xbmc/pelisalacarta/
 #
@@ -41,7 +41,6 @@ def getmainlist(preferred_thumb=""):
 
     # Añade los canales que forman el menú principal
 
-    itemlist.append( Item( title=config.get_localized_string(30121) , channel="channelselector" , action="filterchannels" , channel_type="all", category="all" , thumbnail= os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_all.png"),viewmode="movie") )
     itemlist.append( Item(title=config.get_localized_string(30119) , channel="channelselector" , action="getchanneltypes", thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_category.png"),viewmode="movie") )
     itemlist.append( Item(title=config.get_localized_string(30137) , channel="buscadorall" , action="mainlist" , thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_search.png"),viewmode="movie") )
     itemlist.append( Item(title=config.get_localized_string(30102) , channel="favoritos" , action="mainlist" , thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_fav.png"),viewmode="movie") )
@@ -66,8 +65,8 @@ def getchanneltypes(preferred_thumb=""):
     logger.info("channelselector getchanneltypes")
 
     # Lista de categorias
-    valid_types = ["vos", "torrent"]
-    dict_cat_lang = {'vos': config.get_localized_string(30136), 'torrent': 'Torrent'}
+    valid_types = ""
+    dict_cat_lang = ""
 
     # Lee la lista de canales
     channel_path = os.path.join(config.get_runtime_path(), "channels", '*.xml')
@@ -131,6 +130,10 @@ def getchanneltypes(preferred_thumb=""):
                          category="saghe", channel_type="saghe", thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "cat_menu_saghe.png")))
     itemlist.append( Item(title="Oggi in TV" , channel="filmontv" , action="mainlist" , thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_filmontv.png"),viewmode="movie") )
     itemlist.append( Item(title="Liste Netflix" , channel="netflixsrc" , action="mainlist" , thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "cat_menu_series.png"),viewmode="movie") )
+    itemlist.append( Item( title=config.get_localized_string(30136) , channel="channelselector" , action="filterchannels" , channel_type="vos", category="vos" , thumbnail= os.path.join(config.get_runtime_path() , "resources" , "images", "cat_menu_vos.png"),viewmode="movie") )
+    itemlist.append( Item( title="Torrent" , channel="channelselector" , action="filterchannels" , channel_type="torrent", category="torrent" , thumbnail= os.path.join(config.get_runtime_path() , "resources" , "images", "cat_menu_torrent.png"),viewmode="movie") )
+    itemlist.append( Item( title="[COLOR yellow]" + config.get_localized_string(30121) + "[/COLOR]" , channel="channelselector" , action="filterchannels" , channel_type="all", category="all" , thumbnail= os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_all.png"),viewmode="movie") )
+
     logger.info("channelselector.getchanneltypes Ordenados:")
     for channel_type in valid_types:
         logger.info("channelselector.getchanneltypes channel_type="+channel_type)
