@@ -165,7 +165,7 @@ def episodi(item):
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
 
-    patron = r'<a href="([^"]+)" target="_blank" rel="noopener noreferrer">([^<]+)</a>'
+    patron = r'<a href="([^"]+)" target="_blank"(?:\s*rel="noopener noreferrer"|)>([^<]+)</a>'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedurl, scrapedtitle in matches:
