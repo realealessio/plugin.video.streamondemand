@@ -12,7 +12,7 @@
 	<bannermenu>https://raw.githubusercontent.com/Zanzibar82/images/master/posters/italiafilm.png</bannermenu>
 
 	<update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-	<version>9</version>
+	<version>10</version>
 	<date>16/06/2016</date>
 	<changes>update</changes>
 
@@ -25,8 +25,8 @@
 	<settings>
 		<id>include_in_global_search</id>
 		<type>bool</type>
-		<label>Incluir en busqueda global</label>
-		<default>false</default>
+		<label>Includi ricerca globale</label>
+		<default>true</default>
 		<enabled>true</enabled>
 		<visible>true</visible>
 	</settings>
