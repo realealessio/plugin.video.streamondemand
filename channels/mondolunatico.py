@@ -38,7 +38,6 @@ headers = [
 
 PERPAGE = 25
 
-
 def isGeneric():
     return True
 

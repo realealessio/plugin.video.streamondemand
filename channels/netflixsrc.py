@@ -33,20 +33,54 @@ def isGeneric():
 def mainlist(item):
     logger.info("streamondemand.netflixsrc mainlist")
     itemlist = [Item(channel=__channel__,
-                     title="[COLOR red]Serie Netflix[/COLOR]",
+                     title="[COLOR orange]Novità[/COLOR]",
+                     url="%s/novita-su-netflix/" % host,
+                     action="news",
+                     thumbnail="http://www.netflixlovers.it/img/logo-dark.png?v=2"),
+                Item(channel=__channel__,
+                     title="[COLOR orange]Serie Netflix[/COLOR]",
                      url="%s/classifiche/top-10-serie-tv-le-migliori-serie-tv-su-netflix-italia/" % host,
                      action="serietv",
                      thumbnail="http://www.netflixlovers.it/img/logo-dark.png?v=2"),
                 Item(channel=__channel__,
-                     title="[COLOR red]Film Netflix[/COLOR]",
+                     title="[COLOR orange]Film Netflix[/COLOR]",
                      action="film",
                      url="%s/classifiche/top-10-film-i-migliori-film-su-netflix-italia/" % host,
                      thumbnail="http://www.netflixlovers.it/img/logo-dark.png?v=2"),
                 Item(channel=__channel__,
-                     title="[COLOR red]Documentari Netflix[/COLOR]",
+                     title="[COLOR orange]Documentari Netflix[/COLOR]",
                      action="film",
                      url="%s/classifiche/top-10-documentari-i-migliori-documentari-su-netflix-italia/" % host,
                      thumbnail="http://www.netflixlovers.it/img/logo-dark.png?v=2")]
+
+    return itemlist
+
+def news(item):
+    logger.info("streamondemand.netflixsrc news")
+    itemlist = []
+
+    # Descarga la pagina
+    data = scrapertools.cache_page(item.url)
+
+    # Extrae las entradas (carpetas)
+    patron = '<li class="[^i]+isotope-item([^"]+)">\s*<div[^=]+=[^=]+="([^"]+)">\s*<[^<]+<[^>]+>\s*<[^>]+>\s*<[^>]+>\s*<[^>]+>\s*<img src="([^"]+)"'
+    matches = re.compile(patron, re.DOTALL).findall(data)
+
+    for scrapedtype, scrapedtitle, scrapedthumbnail in matches:
+        scrapedurl = ""
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+        scrapedtitle = scrapedtitle.split("(")[0]
+        scrapedtv = " Netflix"
+
+        itemlist.append(
+            Item(channel=__channel__,
+                 action="do_search",
+                 extra=urllib.quote_plus(scrapedtitle) + '{}' + 'serie',
+                 title=scrapedtitle + "[COLOR orange]" + scrapedtype + "[/COLOR]" + "[COLOR red]" + scrapedtv + "[/COLOR]",
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 folder=True))
 
     return itemlist
 

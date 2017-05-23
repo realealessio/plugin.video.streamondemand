@@ -33,7 +33,6 @@ headers = [
 def isGeneric():
     return True
 
-
 def mainlist(item):
     logger.info("streamondemand.cinemasubito mainlist")
     itemlist = [Item(channel=__channel__,

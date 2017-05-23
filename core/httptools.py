@@ -44,9 +44,9 @@ ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 # Headers por defecto, si no se especifica nada
 default_headers = dict()
-default_headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
+default_headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0"
 default_headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-default_headers["Accept-Language"] = "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3"
+default_headers["Accept-Language"] = "it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3"
 default_headers["Accept-Charset"] = "UTF-8"
 default_headers["Accept-Encoding"] = "gzip"
 

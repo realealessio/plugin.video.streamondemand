@@ -1,3 +1,8 @@
+v5.5.4
+- main menu update
+- removed dead channels
+- new channels
+
 v5.5.3
 - mitigated thread in search
 - update on menu

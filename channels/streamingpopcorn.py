@@ -31,7 +31,6 @@ host = "http://streamingpopcorn.com/portal/"
 def isGeneric():
     return True
 
-
 def mainlist(item):
     logger.info("streamondemand.streamingpopcorn mainlist")
     itemlist = [Item(channel=__channel__,
@@ -41,7 +40,6 @@ def mainlist(item):
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png")]
 
     return itemlist
-
 
 def peliculas(item):
     logger.info("streamondemand.streamingpopcorn peliculas")

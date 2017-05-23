@@ -97,7 +97,6 @@ def peliculas_rss(item):
 
     return itemlist
 
-
 def findvideos(item):
     logger.info("[videotecadiclasse.py] findvideos")
     itemlist = []
