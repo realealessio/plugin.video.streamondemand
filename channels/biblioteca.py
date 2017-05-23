@@ -548,7 +548,6 @@ def update_serie(item):
 
     p_dialog.close()
 
-
 def mark_content_as_watched(item):
     logger.info()
     # logger.debug("item:\n" + item.tostring('\n'))

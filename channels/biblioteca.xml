@@ -12,7 +12,7 @@
 	<bannermenu></bannermenu>
 
 	<update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-    <version>14</version>
+    <version>15</version>
 
 	<changes>
 		<change>
@@ -282,7 +282,7 @@
 	<settings>
 		<id>tvdb_retry_eng</id>
 		<type>bool</type>
-		<label>        Ricerca anche in inglese se non ci sono risultati</label>
+		<label>        Ricerca in inglese se non ci sono risultati in italiano</label>
 		<default>true</default>
 		<enabled>eq(-1,TheTvDB.com)</enabled>
 		<visible>true</visible>
