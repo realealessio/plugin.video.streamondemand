@@ -12,7 +12,7 @@
 	<bannermenu></bannermenu>
 
 	<update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-    <version>14</version>
+    <version>15</version>
 
 	<changes>
 		<change>
@@ -52,7 +52,7 @@
 	<settings>
 		<id>everyday_delay</id>
 		<type>list</type>
-		<label>   - Iniciar actualización programada a partir de las</label>
+		<label>   - Aggiorna a partire dalle</label>
 		<default>1</default>
 		<visible>true</visible>
 		<enabled>eq(-2,Una sola volta al giorno)|eq(-2,Quando si avvia Kodi e quotidiano)</enabled>
@@ -116,7 +116,7 @@
 	<settings>
 		<id>white_list_order</id>
 		<type>bool</type>
-		<label>   - Ordenar segun el orden de la lista blanca</label>
+		<label>   - Ordina per whitelist</label>
 		<enabled>true</enabled>
 		<visible>true</visible>
 		<default>false</default>
@@ -124,7 +124,7 @@
 	<settings>
 		<id>quit_channel_name</id>
 		<type>bool</type>
-		<label>   - Quitar el nombre del canal del principio</label>
+		<label>   - Rimuovi il nome del canale dalla lista episodi</label>
 		<enabled>true</enabled>
 		<visible>true</visible>
 		<default>false</default>
@@ -132,7 +132,7 @@
 	<settings>
 		<id>replace_VD</id>
 		<type>bool</type>
-		<label>   - Ventana emergente: Reemplazar "Ver en" por "[V]" y "Descargar en" por "[D]"</label>
+		<label>   - Pop: Sostituire "View" con "[V]" e "Scarica" con "[D]"</label>
 		<enabled>true</enabled>
 		<visible>true</visible>
 		<default>false</default>
@@ -282,7 +282,7 @@
 	<settings>
 		<id>tvdb_retry_eng</id>
 		<type>bool</type>
-		<label>        Si no hay resultados buscar también en Inglés</label>
+		<label>        Ricerca in inglese se non ci sono risultati in italiano</label>
 		<default>true</default>
 		<enabled>eq(-1,TheTvDB.com)</enabled>
 		<visible>true</visible>

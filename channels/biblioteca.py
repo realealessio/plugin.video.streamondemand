@@ -511,7 +511,6 @@ def play(item):
 
     return itemlist
 
-
 def update_biblio(item):
     logger.info()
 
@@ -548,7 +547,6 @@ def update_serie(item):
         xbmc_library.update(folder=filetools.basename(item.path))
 
     p_dialog.close()
-
 
 def mark_content_as_watched(item):
     logger.info()

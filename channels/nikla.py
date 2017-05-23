@@ -36,6 +36,8 @@ def mainlist(item):
 
     return itemlist
 
+from itertools import islice
+
 def peliculas(item):
     logger.info("streamondemand.nikla peliculas")
     itemlist = []
