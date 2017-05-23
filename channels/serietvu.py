@@ -37,7 +37,7 @@ def mainlist(item):
     logger.info("[SerieTVU.py]==> mainlist")
     itemlist = [Item(channel=__channel__,
                      action="lista_serie",
-                     title=color("Nuove serie TV Aggiunte", "orange"),
+                     title=color("Nuove serie TV", "orange"),
                      url="%s/category/serie-tv" % host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
@@ -99,7 +99,6 @@ def categorie(item):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
-# (Il problema è del sito stesso, non del canale) - Non è possibile aggiungere l'item "Successivo" perchè il sito ritorna all'homepage quando viene cliccato
 def lista_serie(item):
     logger.info("[SerieTVU.py]==> lista_serie")
     itemlist = []
@@ -121,6 +120,23 @@ def lista_serie(item):
                  thumbnail=scrapedimg,
                  show=scrapedtitle,
                  folder=True), tipo="tv"))
+
+    # Pagine
+    patron = r'<li><a href="([^"]+)"\s*>Pagina'
+    next_page = scrapertools.find_single_match(data, patron)
+    if len(matches) > 0:
+        itemlist.append(
+            Item(channel=__channel__,
+                 action="HomePage",
+                 title="[COLOR yellow]Torna Home[/COLOR]",
+                 folder=True)),
+        itemlist.append(
+            Item(channel=__channel__,
+                 action="lista_serie",
+                 title="[COLOR orange]Successivo >>[/COLOR]",
+                 url=next_page,
+                 thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",
+                 folder=True))
     return itemlist
 
 # ================================================================================================================
@@ -192,6 +208,10 @@ def findvideos(item):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
+def HomePage(item):
+    import xbmc
+    xbmc.executebuiltin("ReplaceWindow(10024,plugin://plugin.video.streamondemand/)")
+
 def color(text, color):
     return "[COLOR "+color+"]"+text+"[/COLOR]"
 
