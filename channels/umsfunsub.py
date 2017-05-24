@@ -31,7 +31,6 @@ headers = [
     ['Referer', host]
 ]
 
-
 def isGeneric():
     return True
 
@@ -40,18 +39,18 @@ def isGeneric():
 def mainlist(item):
     logger.info("[UMSFunSub.py]==> mainlist")
     itemlist = [Item(channel=__channel__,
-                     title="[COLOR azure] Progetti [/COLOR]",
+                     title=color("Progetti", "azure"),
                      action="progetti",
                      plot="- In corso\n- Conclusi",
                      url=makeurl("progetti-fansub-anime-giapponesi-attivi-shoujo-shounen-manga.php"),
                      thumbnail="http://www.hiumi.it/public/forum/styles/art_deluxe/imageset/logo.png"),
                 Item(channel=__channel__,
-                     title="[COLOR azure] Lista completa [/COLOR]",
+                     title=color("Lista Completa", "azure"),
                      action="lista_anime",
                      url=makeurl("streaming-fansub-gratuiti.php?categoria=In_corso&cat=Conclusi"),
                      thumbnail="http://www.hiumi.it/public/forum/styles/art_deluxe/imageset/logo.png"),
                 Item(channel=__channel__,
-                     title="[COLOR yellow] Cerca ... [/COLOR]",
+                     title=color("Cerca ...", "yellow"),
                      action="search",
                      thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search")
                 ]
@@ -76,7 +75,7 @@ def progetti(item):
             itemlist.append(
                 Item(channel=__channel__,
                      action="lista_anime",
-                     title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+                     title=color(scrapedtitle, "azure"),
                      url=makeurl(scrapedurl),
                      thumbnail=item.thumbnail,
                      folder=True))
@@ -102,7 +101,7 @@ def search(item, texto):
 
 # ----------------------------------------------------------------------------------------------------------------
 def lista_anime(item):
-    logger.info("[UMSFunSub.py]==> lista")
+    logger.info("[UMSFunSub.py]==> lista_anime")
     itemlist = []
 
     data = scrapertools.cache_page(item.url, headers=headers)
@@ -111,11 +110,11 @@ def lista_anime(item):
 
     for scrapedthumbnail, scrapeddetails, scrapedurl, scrapedtitle in matches:
         scrapedurl = item.url.replace(item.url.split("/")[-1], scrapedurl)
-        scrapedtitle = encode(scrapedtitle).strip()
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
         itemlist.append(infoSod(
             Item(channel=__channel__,
                  action="episodi",
-                 title=scrapedtitle + "[COLOR red] | [/COLOR][COLOR deepskyblue]" + scrapeddetails + "[/COLOR]",
+                 title="%s %s %s" % (color(scrapedtitle, "azure"), color(" | ", "red"), color(scrapeddetails, "deepskyblue")),
                  fulltitle=scrapedtitle,
                  show=scrapedtitle,
                  url=scrapedurl,
@@ -138,16 +137,13 @@ def episodi(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapednumber, scrapedtitle, scrapedid in matches:
-        itemtitle = item.title.replace("[COLOR red] |" + item.title.split("|")[-1], "")
-        if len(itemtitle) >= 20:
-            fullitemtitle = encode(itemtitle[:20]) + "[COLOR gray].[/COLOR][COLOR dimgray].[/COLOR][COLOR black].[/COLOR]"
-        else:
-            fullitemtitle = encode(itemtitle)
+        animetitle = item.title.replace("[COLOR red] |" + item.title.split("|")[-1], "")
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
         itemlist.append(
             Item(channel=__channel__,
                  action="findvideos",
-                 title="[COLOR gold]" + scrapednumber + "[/COLOR] | [COLOR azure]" + itemtitle + "[/COLOR] - [COLOR deepskyblue]" + encode(scrapedtitle).strip() + "[/COLOR]",
-                 fulltitle="[COLOR red]" + fullitemtitle + "[/COLOR] | [COLOR deepskyblue]" + scrapedtitle.strip() + "[/COLOR]",
+                 title="%s | %s - %s" % (color(scrapednumber, "gold"), color(animetitle, "azure"), color(scrapedtitle, "deepskyblue")),
+                 fulltitle="%s | %s" % (color(animetitle, "red"), color(scrapedtitle, "deepskyblue")),
                  show=item.show,
                  url=makeurl("dettagli-stream.php?id=" + scrapedid, item.title),
                  thumbnail=item.thumbnail,
@@ -170,7 +166,7 @@ def findvideos(item):
 
     itemlist.append(Item(channel=__channel__,
                          action="play",
-                         title=item.title + " [[COLOR orange]." + estensionevideo + "[/COLOR]]",
+                         title="[%s] %s" % (color("."+estensionevideo, "orange"), item.title),
                          fulltitle=item.fulltitle,
                          show=item.show,
                          url=urlvideo,
@@ -180,12 +176,9 @@ def findvideos(item):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
-def encode(text):
-    return text.decode("latin1").encode("utf8")
+def color(text, color):
+    return "[COLOR "+color+"]"+text+"[/COLOR]"
 
-# ================================================================================================================
-
-# ----------------------------------------------------------------------------------------------------------------
 def makeurl(text, title=""):
     if title == "":
         return host + "/" + text

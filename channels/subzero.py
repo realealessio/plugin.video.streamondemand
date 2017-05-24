@@ -19,10 +19,12 @@ __type__ = "generic"
 __title__ = "SubZero"
 __language__ = "IT"
 
+host = "http://www.subzero.it"
+
 headers = [
     ['User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:51.0) Gecko/20100101 Firefox/51.0'],
     ['Accept-Encoding', 'gzip, deflate'],
-    ['Referer', "http://www.subzero.it"]
+    ['Referer', host]
 ]
 
 def isGeneric():
@@ -32,14 +34,9 @@ def isGeneric():
 def mainlist(item):
     logger.info("[SubZero.py]==> mainlist")
     itemlist = [Item(channel=__channel__,
-                     action="ultimitorrent",
-                     title=color("Ultimi torrent", "orange"),
-                     url="https://www.nyaa.se/?page=separate&user=97824",
-                     thumbnail="https://raw.githubusercontent.com/MrTruth0/imgs/master/SOD/Channels/SubZero.png"),
-                Item(channel=__channel__,
-                     action="listacompleta",
-                     title=color("Lista completa", "azure"),
-                     url="https://www.nyaa.se/?page=separate&user=97824",
+                     action="torrent",
+                     title=color("Lista torrent", "azure"),
+                     url="%s/torrent" % host,
                      thumbnail="https://raw.githubusercontent.com/MrTruth0/imgs/master/SOD/Channels/SubZero.png")
                 ]
 
@@ -48,71 +45,46 @@ def mainlist(item):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
-def ultimitorrent(item):
-    logger.info("[SubZero.py]==> ultimitorrent")
+def torrent (item):
+    logger.info("[SubZero.py]==> torrent")
     itemlist = []
 
     data = scrapertools.cache_page(item.url, headers=headers)
-    blocco = scrapertools.get_match(data, '<table class="titleTable"><tr class="titleDivider">(.*?)</table>')
-    patron = \
-        '<tr class="[titleOdd|titleEven]+"><td class="name">\[.*?\](.*?)</td>[^>]+>[^>]+>([\-?\d]+).*?<[^>]+>[^>]+><td class="center">.*?(\d+p).*?</td>[^>]+>[^>]+>[^>]+><a href="(.*?)"'
-    matches = re.compile(patron, re.DOTALL).findall(blocco)
-
-    for scrapedtitle, scrapedinfo1, scrapedinfo2, scrapedurl in matches:
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="play",
-                 server="torrent",
-                 title=color((color(".torrent ", "darkkhaki") + color(encode(scrapedinfo1), "gold") + " | " + color(scrapedtitle, "deepskyblue") + "(" + color(scrapedinfo2, "orange") + ")"), "azure"),
-                 url="https:" + scrapedurl.replace("#38;", ""),
-                 thumbnail=item.thumbnail,
-                 folder=True))
-
-    return itemlist
-
-# ================================================================================================================
-
-# ----------------------------------------------------------------------------------------------------------------
-def listacompleta (item):
-    logger.info("[SubZero.py]==> listacompleta")
-    itemlist = []
-
-    data = scrapertools.cache_page(item.url, headers=headers)
-    blocco = scrapertools.get_match(data, '<table class="titleTable"><tbody>(.*?)</table>')
-    patron = '<tr class="titleColumn"><td class=".*?" colspan=".*?">.*?<.*?;">\[.*?\](.*?)</span></td>(.*?<a href="(.*?)">([\w|\-?\d]+).*?</a></td>.*?)</tbody>'
-    matches = re.compile(patron, re.DOTALL).findall(blocco)
-    for scrapedtitle, scrapeddata, scrapedurl, scrapedinfo in matches:
+    patron = r'<p><font size=\d+>\s*<a href="([^"]+)">([^<]+)</a>'
+    matches = re.compile(patron, re.DOTALL).findall(data)
+    for scrapedurl, scrapedtitle in matches:
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip();
         itemlist.append(infoSod(
             Item(channel=__channel__,
-                 action="content",
-                 title=color(".torrent ", "darkkhaki") + color(encode(scrapedtitle.strip()), "deepskyblue"),
+                 action="findvideos",
+                 title=color(".torrent ", "darkkhaki") + color(scrapedtitle, "deepskyblue"),
                  fulltitle=scrapedtitle,
-                 url="https:" + scrapedurl.replace("#38;", ""),
-                 extra=scrapeddata,
+                 url=scrapedurl,
                  thumbnail=item.thumbnail,
-                 folder=True), tipo="movie" if ("Movie" or "Special" or "Teaser") in scrapedinfo else "tv"))
+                 folder=True), tipo="tv"))
 
     return itemlist
 
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
-def content(item):
-    logger.info("[SubZero.py]==> content")
+def findvideos(item):
+    logger.info("[SubZero.py]==> findvideos")
     itemlist = []
 
-    data = item.extra
-    patron = '<tr class="[titleOdd|titleEven]+">.*?>([\-?\d|\w]+).*?</a>.*?"center">.*?([\-\.a-zA-Z0-9\s]+)</td>.*?<a href="(.*?)".*?<td class="number">(.*?)</td>'
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    data = scrapertools.cache_page(item.url, headers=headers)
+    patron = r'<p><a href="([^"]+)">([^<]+)</a></p>'
+    blocco = scrapertools.get_match(data, r'<br\s*/>Torrent:</p>(.*?)<hr size=\d+>\s*</table>')
+    matches = re.compile(patron, re.DOTALL).findall(blocco)
 
-    for scrapednumber, scrapedinfo, scrapedurl, scrapedsize in matches:
+    for scrapedurl, scrapedtitle in matches:
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle).strip()
         itemlist.append(
             Item(channel=__channel__,
                  action="play",
                  server="torrent",
-                 title=color((item.title.replace(".torrent", color(".torrent ", "darkkhaki") + color(scrapednumber, "gold") + color(" | ", "azure")) + " (Play)"), "azure"),
-                 plot="Peso: " + scrapedsize + "\n" + scrapedinfo,
-                 url="https:" + scrapedurl.replace("#38;", ""),
+                 title=color(scrapedtitle, "azure"),
+                 url=scrapedurl,
                  thumbnail=item.thumbnail,
                  folder=False))
 
@@ -121,9 +93,7 @@ def content(item):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
-def encode(text):
-    return text.decode("latin1").encode("utf8")
-
 def color(text, color):
     return "[COLOR "+color+"]"+text+"[/COLOR]"
+
 # ================================================================================================================

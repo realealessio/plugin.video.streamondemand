@@ -12,9 +12,9 @@
     <bannermenu>https://raw.githubusercontent.com/MrTruth0/imgs/master/SOD/Channels/SubZero.png</bannermenu>
 
     <update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-    <version>2</version>
-    <date>25/02/2017</date>
-    <changes>new channel</changes>
+    <version>3</version>
+    <date>24/05/2017</date>
+    <changes>Small Fix</changes>
 
     <categories>
         <category>anime</category>
