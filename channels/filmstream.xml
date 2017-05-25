@@ -12,9 +12,9 @@
 	<bannermenu>http://cdn2.film-stream.biz/wp-content/uploads/2011/10/film.jpg</bannermenu>
 
 	<update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-	<version>1</version>
-	<date>21/04/2017</date>
-	<changes>update</changes>
+	<version>2</version>
+	<date>25/05/2017</date>
+	<changes>Readded TV Series Updates</changes>
 
 	<categories>
 		<category>movie</category>

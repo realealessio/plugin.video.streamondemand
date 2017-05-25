@@ -41,11 +41,23 @@ def mainlist(item):
                      url="%s/serie-tv" % host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
+                     title="[COLOR azure]Ultimi episodi Serie TV[/COLOR]",
+                     action="ultimiep",
+                     extra='serie',
+                     url=host,
+                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
+                Item(channel=__channel__,
                      title="[COLOR azure]Anime / Cartoni[/COLOR]",
                      action="serietv",
                      extra='serie',
                      url="%s/anime" % host,
                      thumbnail="http://orig09.deviantart.net/df5a/f/2014/169/2/a/fist_of_the_north_star_folder_icon_by_minacsky_saya-d7mq8c8.png"),
+                Item(channel=__channel__,
+                     title="[COLOR azure]Ultimi episodi Anime[/COLOR]",
+                     action="ultimiep",
+                     extra='anime',
+                     url=host,
+                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
                      title="[COLOR yellow]Cerca...[/COLOR]",
                      action="search",
@@ -106,6 +118,40 @@ def serietv(item):
                  extra=item.extra,
                  folder=True))
 
+    return itemlist
+
+def ultimiep(item):
+    logger.info("streamondemand.dreamsub ultimiep")
+    itemlist = []
+
+    # Descarga la pagina
+    data = scrapertools.cache_page(item.url, headers=headers)
+    if 'anime' in item.extra:
+        bloque = scrapertools.get_match(data, '<ul class="last" id="recentAddedEpisodesAnimeDDM">(.*?)</ul>')
+    elif 'serie' in item.extra:
+        bloque = scrapertools.get_match(data, '<ul class="last" id="recentAddedEpisodesTVDDM">(.*?)</ul>')
+
+    # Extrae las entradas (carpetas)
+    patron = '<li><a href="([^"]+)"[^>]+>([^<]+)<br>'
+    matches = re.compile(patron, re.DOTALL).findall(bloque)
+
+    for scrapedurl, scrapedtitle in matches:
+        scrapedurl = host + scrapedurl
+        scrapedplot = ""
+        scrapedthumbnail = ""
+        if (DEBUG): logger.info(
+            "title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="findvideos",
+                 fulltitle=(re.sub(r'\d+$', '', scrapedtitle) if 'anime' in item.extra else re.sub(r'\d+x\d+$', '', scrapedtitle)).strip(),
+                 show=scrapedtitle,
+                 title=scrapedtitle,
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 plot=scrapedplot,
+                 extra=item.extra,
+                 folder=True), tipo='tv'))
     return itemlist
 
 def HomePage(item):
