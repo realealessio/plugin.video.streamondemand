@@ -150,7 +150,7 @@ class InfoWindow(xbmcgui.WindowXMLDialog):
             self.getControl(10007).setLabel(self.result.get("title", "N/A"))
             self.getControl(10008).setLabel("Titolo Or.:")
             self.getControl(10009).setLabel(self.result.get("originaltitle", "N/A"))
-            self.getControl(100010).setLabel("Idioma original:")
+            self.getControl(100010).setLabel("Lingua Or:")
             self.getControl(100011).setLabel(self.result.get("language", "N/A"))
             self.getControl(100012).setLabel("Punteggio:")
             self.getControl(100013).setLabel(self.result.get("puntuacion", "N/A"))
