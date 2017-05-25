@@ -89,8 +89,8 @@ def nuoveserie(item):
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
     blocco = scrapertools.get_match(data, '<div\s*class="container container-title-serie-new container-scheda" meta-slug="new">(.*?)</div></div><div')
 
-    patron = '<a\s*href="([^"]+)".*?>\s*<img\s*.*?src="([^"]+)" />[^>]+>[^>]+>[^>]+>[^>]+>'
-    patron += '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p>'
+    patron = r'<a\s*href="([^"]+)".*?>\s*<img\s*.*?src="([^"]+)" />[^>]+>[^>]+>[^>]+>[^>]+>'
+    patron += r'[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p>'
     matches = re.compile(patron, re.DOTALL).findall(blocco)
 
     for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
@@ -118,20 +118,20 @@ def serietvaggiornate(item):
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
     blocco = scrapertools.get_match(data, '<div\s*class="container container-title-serie-lastep  container-scheda" meta-slug="lastep">(.*?)</div></div><div')
-    patron = '<a\s*.*?href="([^"]+)".*?> <img\s*.*?src="([^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>'
-    patron += '[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p>'
+    patron = r'<a\s*.*?href="([^"]+)".*?> <img\s*.*?src="([^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>'
+    patron += r'[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p>'
     matches = re.compile(patron, re.DOTALL).findall(blocco)
 
-    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
+    for scrapedurl, scrapedthumbnail, scrapedep, scrapedtitle in matches:
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
-        if DEBUG: logger.info("Scrapedurl: " + scrapedurl + " | ScrapedThumbnail: " + scrapedthumbnail + " | ScrapedTitle: " + scrapedtitle)
+        if DEBUG: logger.info("Scrapedurl: " + scrapedurl + " | ScrapedThumbnail: " + scrapedthumbnail + " | ScrapedEp: " + scrapedep + " | ScrapedTitle: " + scrapedtitle)
         if "toroadvertisingmedia" in scrapedurl:
             scrapedurl = host + "/" + scrapedtitle.replace(" ", "-")
         itemlist.append(infoSod(
             Item(channel=__channel__,
                  action="episodi",
                  contentType="tv",
-                 title=scrapedtitle,
+                 title="%s - %s" % (scrapedtitle, scrapedep),
                  fulltitle=scrapedtitle,
                  url=scrapedurl,
                  extra="tv",

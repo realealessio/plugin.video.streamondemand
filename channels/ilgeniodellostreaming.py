@@ -55,6 +55,11 @@ def mainlist(item):
                      url="%s/serie/" % host,
                      thumbnail="http://www.ilmioprofessionista.it/wp-content/uploads/2015/04/TVSeries3.png"),
                 Item(channel=__channel__,
+                     title="[COLOR azure]Nuovi Episodi Serie TV[/COLOR]",
+                     action="nuoviep",
+                     url="%s/aggiornamenti-serie/" % host,
+                     thumbnail="http://www.ilmioprofessionista.it/wp-content/uploads/2015/04/TVSeries3.png"),
+                Item(channel=__channel__,
                      title="[COLOR azure]Anime[/COLOR]",
                      action="serie",
                      url="%s/anime/" % host,
@@ -191,6 +196,35 @@ def peliculas(item):
                  thumbnail="http://2.bp.blogspot.com/-fE9tzwmjaeQ/UcM2apxDtjI/AAAAAAAAeeg/WKSGM2TADLM/s1600/pager+old.png",
                  folder=True))
 
+    return itemlist
+
+def nuoviep(item):
+    logger.info("streamondemand.ilgeniodellostreaming nuoviep")
+    itemlist = []
+
+    # Descarga la pagina
+    data = scrapertools.anti_cloudflare(item.url, headers)
+    blocco = scrapertools.get_match(data, r'<div class="items" style="margin-bottom:0px!important">(.*?)<div class="items" style="margin-bottom:0px!important">')
+
+    # Extrae las entradas (carpetas)
+    patron = r'<div class="poster"><img src="([^"]+)" alt="([^"]+)">[^>]+><a href="([^"]+)">'
+    matches = re.compile(patron, re.DOTALL).findall(blocco)
+
+    for scrapedthumbnail, scrapedtitle, scrapedurl in matches:
+        scrapedplot = ""
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+        if DEBUG: logger.info(
+            "title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
+        itemlist.append(
+            Item(channel=__channel__,
+                 action="episodios",
+                 fulltitle=scrapedtitle,
+                 show=scrapedtitle,
+                 title="[COLOR azure]" + scrapedtitle + "[/COLOR]",
+                 url=scrapedurl,
+                 thumbnail=scrapedthumbnail,
+                 plot=scrapedplot,
+                 folder=True))
     return itemlist
 
 def serie(item):

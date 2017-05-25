@@ -55,12 +55,12 @@ def mainlist(item):
                      action="peliculas_tv",
                      url="%s/category/serie-tv/" % host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
-                #Item(channel=__channel__,
-                #     title="[COLOR azure]Aggiornamento Serie TV[/COLOR]",
-                #     extra="serie",
-                #     action="aggiornamenti",
-                #     url="%s/serietv/" % host,
-                #     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
+                Item(channel=__channel__,
+                     title="[COLOR azure]Aggiornamento Serie TV ([COLOR red]Lento[/COLOR])[/COLOR]",
+                     extra="serie",
+                     action="aggiornamenti",
+                     url="%s/serietv/" % host,
+                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
                      title="[COLOR yellow]Cerca Serie TV...[/COLOR]",
                      action="search",
@@ -125,7 +125,7 @@ def aggiornamenti(item):
     Day_List = []
     starts = []
     # Descarga la pagina
-    data = scrapertools.cache_page("http://film-stream.cc/serietv/")
+    data = scrapertools.cache_page("%s/serietv/" % host)
 
     # Extrae las entradas (carpetas)
 
@@ -156,7 +156,7 @@ def aggiornamenti(item):
                  title="[COLOR yellow]" + ToDay + "[/COLOR]",
                  folder=True)),
 
-        patron = '<p>[^<]{,10} <a href="http://film-stream.cc/[^<]+'
+        patron = '<p>[^<]{,10} <a href="%s/[^<]+' % host
         matches = re.compile(patron, re.IGNORECASE).finditer(html)
         lista = list(matches)
 
