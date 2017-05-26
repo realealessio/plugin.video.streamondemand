@@ -41,6 +41,11 @@ def mainlist(item):
                      url="%s/category/serie-tv" % host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
+                     action="latestep",
+                     title=color("Nuovi Episodi", "azure"),
+                     url="%s/ultimi-episodi" % host,
+                     thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
+                Item(channel=__channel__,
                      action="lista_serie",
                      title=color("Serie TV Aggiornate", "azure"),
                      url="%s/ultimi-episodi" % host,
@@ -99,6 +104,32 @@ def categorie(item):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
+def latestep(item):
+    logger.info("[SerieTVU.py]==> latestep")
+    itemlist = []
+
+    data = scrapertools.anti_cloudflare(item.url, headers=headers)
+
+    patron = '<div class="item">\s*<a href="([^"]+)" data-original="([^"]+)" class="lazy inner">'
+    patron += '[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<small>([^<]+)<'
+    matches = re.compile(patron, re.DOTALL).findall(data)
+
+    for scrapedurl, scrapedimg, scrapedtitle, scrapedinfo in matches:
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle.strip())
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="episodios",
+                 title="%s %s" % (scrapedtitle, scrapedinfo),
+                 fulltitle=scrapedtitle,
+                 url=scrapedurl,
+                 thumbnail=scrapedimg,
+                 show=scrapedtitle,
+                 folder=True), tipo="tv"))
+    return itemlist
+
+# ================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------
 def lista_serie(item):
     logger.info("[SerieTVU.py]==> lista_serie")
     itemlist = []
@@ -106,7 +137,7 @@ def lista_serie(item):
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
 
     patron = '<div class="item">\s*<a href="([^"]+)" data-original="([^"]+)" class="lazy inner">'
-    patron += '[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)(?:<br>|<small>)'
+    patron += '[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedurl, scrapedimg, scrapedtitle in matches:
@@ -198,7 +229,8 @@ def findvideos(item):
     # per estrarre il video lo sistemi per favore.
     if len(itemlist) > 1:
         itemlist.remove(itemlist[1])
-    itemlist[0].title = "".join([item.title, color(itemlist[0].title, "orange")])
+    server = re.sub(r'[-\[\]\s]+', '', itemlist[0].title)
+    itemlist[0].title = "".join(["[%s] " % color(server, 'orange'), item.title])
     itemlist[0].fulltitle = item.fulltitle
     itemlist[0].show = item.show
     itemlist[0].thumbnail = item.thumbnail

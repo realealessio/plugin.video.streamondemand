@@ -11,9 +11,9 @@
     <bannermenu>http://www.serietvu.com/wp-content/themes/gurarjbar/images/logo.png</bannermenu>
 
     <update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-    <version>5</version>
-    <date>23/05/2017</date>
-    <changes>Small Fix</changes>
+    <version>6</version>
+    <date>26/05/2017</date>
+    <changes>Added latest episodes and changed servers view</changes>
 
     <categories>
         <category>serie</category>
