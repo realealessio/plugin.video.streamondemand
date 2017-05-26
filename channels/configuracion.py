@@ -355,11 +355,11 @@ def backups(item):
     ruta = filetools.join(config.get_data_path(), 'backups')
     ruta_split = ""
     if "ruta" in item.title:
-        heading = "Ruta de copias de seguridad"
+        heading = "Percorso di backup"
         if not filetools.exists(ruta):
-            folders = "Carpeta no creada"
+            folders = "Directory non creata"
         else:
-            folders = str(len(filetools.listdir(ruta))) + " copia/s de seguridad guardadas"
+            folders = str(len(filetools.listdir(ruta))) + " copia/e di backup"
         if len(ruta) > 55:
             ruta_split = ruta[55:]
             ruta = ruta[:55]
