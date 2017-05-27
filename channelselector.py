@@ -43,7 +43,7 @@ def getmainlist(preferred_thumb=""):
 
     itemlist.append( Item(title=config.get_localized_string(30119) , channel="channelselector" , action="getchanneltypes", thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_category.png"),viewmode="movie") )
     itemlist.append( Item(title=config.get_localized_string(30137) , channel="buscadorall" , action="mainlist" , thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_search.png"),viewmode="movie") )
-    #itemlist.append( Item(title="Novità", channel="novedades" , action="mainlist", thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "thumb_novedades.png"),viewmode="movie") )
+    itemlist.append( Item(title="Novità", channel="novedades" , action="mainlist", thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "thumb_novedades.png"),viewmode="movie") )
     itemlist.append( Item(title=config.get_localized_string(30102) , channel="favoritos" , action="mainlist" , thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_fav.png"),viewmode="movie") )
     if config.get_library_support():
         itemlist.append( Item(title=config.get_localized_string(30131) , channel="biblioteca" , action="mainlist", thumbnail = os.path.join(config.get_runtime_path() , "resources" , "images", "main_menu_library.png"),viewmode="movie") )
