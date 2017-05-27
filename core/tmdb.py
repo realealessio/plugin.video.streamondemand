@@ -385,8 +385,12 @@ def find_and_set_infoLabels(item):
 
     if len(results) > 1:
         from platformcode import platformtools
-        tmdb_result = platformtools.show_video_info(results, item=item,
-                                                    caption="[%s]: Selecciona la %s correcta" % (title, tipo_contenido))
+        if tipo_contenido == "pelicula":
+            tmdb_result = platformtools.show_video_info(results, item=item,
+                                                    caption="[%s]: Seleziona il film corretto" % (title))
+        else:
+            tmdb_result = platformtools.show_video_info(results, item=item,
+                                                    caption="[%s]: Seleziona la serie TV corretta" % (title))
     elif len(results) > 0:
         tmdb_result = results[0]
 
