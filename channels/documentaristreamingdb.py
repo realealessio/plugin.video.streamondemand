@@ -161,6 +161,49 @@ def peliculas(item):
 
     return itemlist
 
+def findvideos(item):
+    logger.info("streamondemand.documentaristreamingdb findvideos")
+
+    data = scrapertools.cache_page(item.url, headers=headers)
+    
+    links = []
+    begin = data.find('<div class="moview-details-text">')
+    if begin != -1:
+        end = data.find('<!-- //movie-details -->', begin)
+        mdiv = data[begin:end]
+        
+        items = [[m.end(), m.group(1)] for m in re.finditer('<b style="color:#333333;">(.*?)<\/b>', mdiv)]
+
+        for idx, val in enumerate(items):
+            if idx == len(items)-1:
+                data = mdiv[val[0]:-1]
+            else:
+                data = mdiv[val[0]:items[idx+1][0]]
+            
+            for link in re.findall('<a.*?href="([^"]+)"[^>]+>.*?<b>(.*?)<\/b><\/a>+', data):
+                links.append([val[1], link[0].strip(), link[1].strip()])
+
+    itemlist = []
+    if links:
+        for l in links:
+            title = l[0].replace('Documentario ', '').replace(' doc ', ' ').replace(' streaming','').replace(' Streaming','')
+            url = l[1]
+            server = l[2]
+            
+            itemlist.append( Item(
+                channel=item.channel, 
+                title=title + ' - [COLOR blue]' + server + '[/COLOR]',
+                action="play", 
+                server=servertools.get_server_from_url(url), 
+                url=url, 
+                thumbnail=item.thumbnail, 
+                fulltitle=title, 
+                show=item.show, 
+                plot=item.plot, 
+                parentContent=item, 
+                folder=False) 
+            )    
+    return itemlist
 
 def HomePage(item):
     import xbmc
