@@ -176,10 +176,10 @@ def novedades(item):
     logger.info("streamondemand.channels.novedades multithread="+str(multithread)) 
 
     if not multithread:
-        if platformtools.dialog_yesno("Búsqueda concurrente desactivada",
-                                      "La búsqueda concurrente de novedades proporciona",
-                                      "una mayor velocidad y su desactivación solo es aconsejable en caso de fallo.",
-                                      "¿Desea activar la búsqueda concurrente ahora?"):
+        if platformtools.dialog_yesno("Multi-thread disattivato",
+                                      "Il multi-thread consente una miglior performance nella ricerca",
+                                      "Nei sistemi con poche risorse potrebbe essere imprecisa",
+                                      "Attivare il multi-thread?"):
             if config.set_setting("multithread", True, "novedades"):
                 multithread = True
 
