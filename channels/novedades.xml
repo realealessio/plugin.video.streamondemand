@@ -5,16 +5,21 @@
 	
 	<active>false</active>
 	<adult>false</adult>
-	<language>es</language>
+	<language>it</language>
 	<include_in_global_search>disabled</include_in_global_search>
 	
 	<fanart></fanart>
 	<thumbnail></thumbnail>
 	
 	<update_url></update_url>
-	<version>3</version>
+	<version>4</version>
 	
 	<changes>
+		<change> 
+			<date>26/05/17</date>
+			<autor>MrTruth</autor>
+			<description>Merge from pelisalacarta</description>
+		</change>
 		<change>
 			<date>11/10/2016</date>
 			<autor>Costaplus</autor>
@@ -53,7 +58,7 @@
     <settings>
 		<id>perfil</id>
 		<type>list</type>
-		<label>Perfil de color</label>
+		<label>Profilo colore</label>
 		<default>0</default>
 		<enabled>true</enabled>
 		<visible>true</visible>
