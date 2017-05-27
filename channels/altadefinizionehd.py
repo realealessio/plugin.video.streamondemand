@@ -84,6 +84,31 @@ def search(item, texto):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
+def newest(categoria):
+    logger.info("[AltadefinizioneHD.py]==> newest " + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://altadefinizionehd.com"
+            item.action = "ultimifilm"
+            itemlist = ultimifilm(item)
+
+            if itemlist[-1].action == "ultimifilm":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
+# ================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------
 def pergenere(item):
     logger.info("[AltadefinizioneHD.py]==> pergenere")
     itemlist = []
@@ -252,12 +277,13 @@ def findvideos(item):
     itemlist = servertools.find_video_items(data=data)
 
     for videoitem in itemlist:
-        videoitem.title = "".join([item.title, color(videoitem.title, "orange")])
+        server = re.sub(r'[-\[\]\s]+', '', videoitem.title)
+        videoitem.title = "".join(["[%s] " % color(server, 'orange'), item.title])
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail
         videoitem.channel = __channel__
-
+        
     return itemlist
 
 # ================================================================================================================

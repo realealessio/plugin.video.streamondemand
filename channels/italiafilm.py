@@ -9,6 +9,7 @@ import re
 import time
 import urlparse
 
+from datetime import date
 from core import config
 from core import logger
 from core import scrapertools
@@ -44,7 +45,7 @@ def mainlist(item):
                      title="[COLOR azure]Film - Novita'[/COLOR]",
                      action="peliculas",
                      extra="movie",
-                     url="%s/category/film-streaming-2016-1/" % host,
+                     url="%s/category/film-streaming-%s/" % (host, date.today().year),
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
                      title="[COLOR azure]Film HD[/COLOR]",
@@ -80,6 +81,29 @@ def mainlist(item):
                      action="search",
                      extra="serie",
                      thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search")]
+    return itemlist
+
+def newest(categoria):
+    logger.info("[italiafilm.py] newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://www.italia-film.gratis/category/film-streaming-%s/" % date.today().year
+            item.action = "peliculas"
+            item.extra = "movie"
+            itemlist = peliculas(item)
+
+            if itemlist[-1].action == "peliculas":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
     return itemlist
 
 def categorias(item):

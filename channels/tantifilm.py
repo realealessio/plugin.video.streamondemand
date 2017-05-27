@@ -77,6 +77,28 @@ def mainlist(item):
     return itemlist
 
 
+def newest(categoria):
+    logger.info("streamondemand.tantifilm newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://www.tantifilm.me"
+            item.action = "latest"
+            itemlist = latest(item)
+
+            if itemlist[-1].action == "latest":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
 def categorias(item):
     itemlist = []
 

@@ -73,6 +73,27 @@ def mainlist(item):
     return itemlist
 
 
+def newest(categoria):
+    logger.info("streamondemand.ilgeniodellostreaming newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://ilgeniodellostreaming.cc/film/"
+            item.action = "peliculas"
+            itemlist = peliculas(item)
+
+            if itemlist[-1].action == "peliculas":
+                itemlist.pop()
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
 def categorias(item):
     logger.info("streamondemand.ilgeniodellostreaming categorias")
     itemlist = []
@@ -225,6 +246,10 @@ def nuoviep(item):
                  thumbnail=scrapedthumbnail,
                  plot=scrapedplot,
                  folder=True))
+    if len(itemlist) == 0:
+        itemlist.append(
+            Item(channel=__channel__,
+                 title="[COLOR red]Nessun nuovo episodio per oggi[/COLOR]"))
     return itemlist
 
 def serie(item):

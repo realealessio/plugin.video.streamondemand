@@ -44,6 +44,30 @@ def mainlist(item):
 # =================================================================
 
 #------------------------------------------------------------------
+def newest(categoria):
+    logger.info("filmhdstreaming newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://filmhdstreaming.org/page/1.html"
+            item.action = "elenco"
+            itemlist = elenco(item)
+
+            if itemlist[-1].action == "elenco":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+# =================================================================
+
+#------------------------------------------------------------------
 # Funzione elenco top
 def elenco_top(item):
     logger.info("filmhdstreaming elenco_top")

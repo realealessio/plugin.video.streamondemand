@@ -64,6 +64,28 @@ def mainlist(item):
     return itemlist
 
 
+def newest(categoria):
+    logger.info("[italiafilmvideohd.py] newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://www.italiafilm.link/cinema/"
+            item.action = "fichas"
+            itemlist = fichas(item)
+
+            if itemlist[-1].action == "fichas":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
 def search(item, texto):
     logger.info("[italiafilmvideohd.py] " + item.url + " search " + texto)
 

@@ -12,9 +12,9 @@
     <bannermenu>http://www.filmstreaming.zone/templates/filmstreaming/images/logo.png</bannermenu>
 
     <update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-    <version>1</version>
-    <date>22/10/2016</date>
-    <changes>update</changes>
+    <version>2</version>
+    <date>26/05/2017</date>
+    <changes>Added newest</changes>
 
     <categories>
         <category>movie</category>
@@ -28,4 +28,13 @@
         <enabled>true</enabled>
         <visible>true</visible>
     </settings>
+
+	<settings>
+		<id>include_in_newest_peliculas</id>
+		<type>bool</type>
+		<label>Includi in novità - film</label>
+		<default>true</default>
+		<enabled>true</enabled>
+		<visible>true</visible>
+	</settings>
 </channel>

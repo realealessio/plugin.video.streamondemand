@@ -82,6 +82,28 @@ def mainlist(item):
     return itemlist
 
 
+def newest(categoria):
+    logger.info("streamondemand.guardarefilm newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://www.guardarefilm.uno/streaming-al-cinema/"
+            item.action = "peliculas"
+            itemlist = peliculas(item)
+
+            if itemlist[-1].action == "peliculas":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
 def categorias(item):
     logger.info("streamondemand.guardarefilm categorias")
     itemlist = []

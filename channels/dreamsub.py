@@ -66,6 +66,37 @@ def mainlist(item):
 
     return itemlist
 
+def newest(categoria):
+    logger.info("streamondemand.altadefinizione01 newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "series":
+            item.url = "https://www.dreamsub.it"
+            item.action = "ultimiep"
+            item.extra = "serie"
+            itemlist = ultimiep(item)
+
+            if itemlist[-1].action == "ultimiep":
+                itemlist.pop()
+        
+        if categoria == "anime":
+            item.url = "https://www.dreamsub.it"
+            item.action = "ultimiep"
+            item.extra = "anime"
+            itemlist = ultimiep(item)
+
+            if itemlist[-1].action == "ultimiep":
+                itemlist.pop()
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
 def serietv(item):
     logger.info("streamondemand.dreamsub peliculas")
     itemlist = []
