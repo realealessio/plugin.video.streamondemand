@@ -12,13 +12,12 @@
        <bannermenu>http://filmhdstreaming.org/css/images/logo3.png</bannermenu>
 
        <update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-       <version>5</version>
-       <date>05/02/2017</date>
-       <changes>Content not working!</changes>
+       <version>6</version>
+       <date>26/05/2017</date>
+       <changes>Added newest</changes>
 
        <categories>
           <category>movie</category>
-
        </categories>
 
        <settings>
@@ -29,5 +28,14 @@
           <enabled>false</enabled>
           <visible>false</visible>
        </settings>
-    </channel>
+
+	<settings>
+		<id>include_in_newest_peliculas</id>
+		<type>bool</type>
+		<label>Includi in novità - film</label>
+		<default>true</default>
+		<enabled>true</enabled>
+		<visible>true</visible>
+	</settings>
+</channel>
 

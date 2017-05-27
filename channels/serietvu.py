@@ -24,7 +24,7 @@ __language__ = "IT"
 host = "http://www.serietvu.com"
 
 headers = [
-    ['User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0'],
+    ['User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'],
     ['Accept-Encoding', 'gzip, deflate'],
     ['Referer', host]
 ]
@@ -65,6 +65,31 @@ def mainlist(item):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
+def newest(categoria):
+    logger.info("[SerieTVU.py]==> newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "series":
+            item.url = "http://www.serietvu.com/ultimi-episodi"
+            item.action = "latestep"
+            itemlist = latestep(item)
+
+            if itemlist[-1].action == "latestep":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
+# ================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------
 def search(item, texto):
     logger.info("[SerieTVU.py]==> search")
     item.url = host + "/?s=" + texto
@@ -85,8 +110,8 @@ def categorie(item):
     itemlist = []
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
-    blocco = scrapertools.get_match(data, '<h2>Sfoglia</h2>\s*<ul>(.*?)</ul>\s*</section>')
-    patron = '<li><a href="([^"]+)">([^<]+)</a></li>'
+    blocco = scrapertools.get_match(data, r'<h2>Sfoglia</h2>\s*<ul>(.*?)</ul>\s*</section>')
+    patron = r'<li><a href="([^"]+)">([^<]+)</a></li>'
     matches = re.compile(patron, re.DOTALL).findall(blocco)
 
     for scrapedurl, scrapedtitle in matches:
@@ -110,20 +135,23 @@ def latestep(item):
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
 
-    patron = '<div class="item">\s*<a href="([^"]+)" data-original="([^"]+)" class="lazy inner">'
-    patron += '[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<small>([^<]+)<'
+    patron = r'<div class="item">\s*<a href="([^"]+)" data-original="([^"]+)" class="lazy inner">'
+    patron += r'[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<small>([^<]+)<'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedurl, scrapedimg, scrapedtitle, scrapedinfo in matches:
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle.strip())
+        episodio = re.compile(r'(\d+)x(\d+)', re.DOTALL).findall(scrapedinfo)
+        title = "%s %s" % (scrapedtitle, scrapedinfo)
         itemlist.append(infoSod(
             Item(channel=__channel__,
-                 action="episodios",
-                 title="%s %s" % (scrapedtitle, scrapedinfo),
+                 action="findepisodevideo",
+                 title=title,
                  fulltitle=scrapedtitle,
                  url=scrapedurl,
+                 extra=episodio,
                  thumbnail=scrapedimg,
-                 show=scrapedtitle,
+                 show=title,
                  folder=True), tipo="tv"))
     return itemlist
 
@@ -136,8 +164,8 @@ def lista_serie(item):
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
 
-    patron = '<div class="item">\s*<a href="([^"]+)" data-original="([^"]+)" class="lazy inner">'
-    patron += '[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<'
+    patron = r'<div class="item">\s*<a href="([^"]+)" data-original="([^"]+)" class="lazy inner">'
+    patron += r'[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedurl, scrapedimg, scrapedtitle in matches:
@@ -179,14 +207,14 @@ def episodios(item):
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
 
-    patron = '<option value="(\d+)"[\sselected]*>.*?</option>'
+    patron = r'<option value="(\d+)"[\sselected]*>.*?</option>'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for value in matches:
-        patron = '<div class="list [active]*" data-id="%s">(.*?)</div>\s*</div>' % value
+        patron = r'<div class="list [active]*" data-id="%s">(.*?)</div>\s*</div>' % value
         blocco = scrapertools.find_single_match(data, patron)
 
-        patron = '(<a data-id="\d+.*?" data-href="([^"]+)" data-original="([^"]+)" class=".*?">)[^>]+>[^>]+>([^<]+)</div>'
+        patron = r'(<a data-id="\d+[^"]*" data-href="([^"]+)" data-original="([^"]+)" class="[^"]+">)[^>]+>[^>]+>([^<]+)</div>'
         matches = re.compile(patron, re.DOTALL).findall(blocco)
         for scrapedextra, scrapedurl, scrapedimg, scrapedtitle in matches:
             scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle.replace("Episodio", "")).strip()
@@ -225,16 +253,59 @@ def findvideos(item):
     logger.info("[SerieTVU.py]==> findvideos")
     itemlist = servertools.find_video_items(data=item.extra)
 
-    # Non sono riuscito a trovare un modo migliore di questo, se qualcuno ha un metodo migliore di questo
-    # per estrarre il video lo sistemi per favore.
-    if len(itemlist) > 1:
-        itemlist.remove(itemlist[1])
-    server = re.sub(r'[-\[\]\s]+', '', itemlist[0].title)
-    itemlist[0].title = "".join(["[%s] " % color(server, 'orange'), item.title])
-    itemlist[0].fulltitle = item.fulltitle
-    itemlist[0].show = item.show
-    itemlist[0].thumbnail = item.thumbnail
-    itemlist[0].channel = __channel__
+    try:
+        # Non sono riuscito a trovare un modo migliore di questo, se qualcuno ha un metodo migliore di questo
+        # per estrarre il video lo sistemi per favore.
+        if len(itemlist) > 1:
+            itemlist.remove(itemlist[1])
+        server = re.sub(r'[-\[\]\s]+', '', itemlist[0].title)
+        itemlist[0].title = "".join(["[%s] " % color(server, 'orange'), item.title])
+        itemlist[0].fulltitle = item.fulltitle
+        itemlist[0].show = item.show
+        itemlist[0].thumbnail = item.thumbnail
+        itemlist[0].channel = __channel__
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []
+    return itemlist
+
+# ================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------
+def findepisodevideo(item):
+    logger.info("[SerieTVU.py]==> findepisodevideo")
+
+    try:
+        # Download Pagina
+        data = scrapertools.anti_cloudflare(item.url, headers=headers)
+
+        # Prendo il blocco specifico per la stagione richiesta
+        patron = r'<div class="list [active]*" data-id="%s">(.*?)</div>\s*</div>' % item.extra[0][0]
+        blocco = scrapertools.find_single_match(data, patron)
+
+        # Estraggo l'episodio
+        patron = r'<a data-id="%s[^"]*" data-href="([^"]+)" data-original="([^"]+)" class="[^"]+">' % item.extra[0][1].lstrip("0")
+        matches = re.compile(patron, re.DOTALL).findall(blocco)
+        
+        itemlist = servertools.find_video_items(data=matches[0][0])
+
+        # Non sono riuscito a trovare un modo migliore di questo, se qualcuno ha un metodo migliore di questo
+        # per estrarre il video lo sistemi per favore.
+        if len(itemlist) > 1:
+            itemlist.remove(itemlist[1])
+        server = re.sub(r'[-\[\]\s]+', '', itemlist[0].title)
+        itemlist[0].title = "".join(["[%s] " % color(server, 'orange'), item.title])
+        itemlist[0].fulltitle = item.fulltitle
+        itemlist[0].show = item.show
+        itemlist[0].thumbnail = matches[0][1]
+        itemlist[0].channel = __channel__
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []
     return itemlist
 
 # ================================================================================================================

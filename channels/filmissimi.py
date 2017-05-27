@@ -80,6 +80,31 @@ def mainlist(item):
 # ===========================================================================================================================================
 
 # -------------------------------------------------------------------------------------------------------------------------------------------
+def newest(categoria):
+    logger.info("[filmissimi.py] newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://www.filmissimi.net"
+            item.action = "elenco"
+            itemlist = elenco(item)
+
+            if itemlist[-1].action == "elenco":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
+# ===========================================================================================================================================
+
+# -------------------------------------------------------------------------------------------------------------------------------------------
 def genere(item):
     logger.info("[filmissimi.py] genere")
     itemlist = []

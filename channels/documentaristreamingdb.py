@@ -24,7 +24,7 @@ DEBUG = config.get_setting("debug")
 host = "http://www.documentari-streaming-db.com"
 
 headers = [
-    ['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0'],
+    ['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0'],
     ['Accept-Encoding', 'gzip, deflate']
 ]
 
@@ -34,7 +34,7 @@ def isGeneric():
 
 
 def mainlist(item):
-    logger.info("streamondemand.istreaming mainlist")
+    logger.info("streamondemand.documentaristreamingdb mainlist")
     itemlist = [Item(channel=__channel__,
                      title="[COLOR azure]Aggiornamenti[/COLOR]",
                      action="peliculas",
@@ -52,6 +52,28 @@ def mainlist(item):
 
     return itemlist
 
+
+def newest(categoria):
+    logger.info("streamondemand.documentaristreamingdb newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "documentales":
+            item.url = "http://www.documentari-streaming-db.com/?searchtype=movie&post_type=movie&sl=lasts&s="
+            item.action = "peliculas"
+            itemlist = peliculas(item)
+
+            if itemlist[-1].action == "peliculas":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
 
 def categorias(item):
     itemlist = []
@@ -89,7 +111,7 @@ def categorias(item):
 
 
 def search(item, texto):
-    logger.info("[strfilm.py] " + item.url + " search " + texto)
+    logger.info("streamondemand.documentaristreamingdb " + item.url + " search " + texto)
     item.url = host + "/?searchtype=movie&post_type=movie&s=" + texto
     try:
         return peliculas(item)

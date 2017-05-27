@@ -12,9 +12,9 @@
 	<bannermenu>http://filmperevolvere.pcriot.com/wp-content/uploads/2017/03/cropped-cropped-ezgif-1-49f9d458f7-1.jpg</bannermenu>
 
 	<update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-	<version>9</version>
-	<date>19/03/2017</date>
-	<changes>fix channel</changes>
+	<version>10</version>
+	<date>26/05/2017</date>
+	<changes>Added newest</changes>
 
 	<categories>
 		<category>movie</category>
@@ -25,6 +25,15 @@
 		<id>include_in_global_search</id>
 		<type>bool</type>
 		<label>Incluir en busqueda global</label>
+		<default>true</default>
+		<enabled>true</enabled>
+		<visible>true</visible>
+	</settings>
+
+	<settings>
+		<id>include_in_newest_peliculas</id>
+		<type>bool</type>
+		<label>Includi in novità - film</label>
 		<default>true</default>
 		<enabled>true</enabled>
 		<visible>true</visible>

@@ -17,7 +17,7 @@ from core.item import Item
 from core.tmdb import infoSod
 
 __channel__ = "itastreaming"
-__category__ = "F,S,A"
+__category__ = "F"
 __type__ = "generic"
 __title__ = "Itastreaming"
 __language__ = "IT"
@@ -81,6 +81,28 @@ def mainlist(item):
 
     return itemlist
 
+
+def newest(categoria):
+    logger.info("[itastreaming.py] newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://itastreaming.gratis/nuove-uscite/"
+            item.action = "fichas"
+            itemlist = fichas(item)
+
+            if itemlist[-1].action == "fichas":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
 
 def search(item, texto):
     logger.info("[itastreaming.py] " + item.url + " search " + texto)

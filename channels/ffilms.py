@@ -9,7 +9,6 @@
 import re
 
 from core import logger
-from core import config
 from core import servertools
 from core import scrapertools
 from core.item import Item
@@ -57,6 +56,32 @@ def mainlist(item):
                      action="search",
                      title=color("Cerca ...", "yellow"),
                      thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search")]
+
+    return itemlist
+
+# ================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------
+def newest(categoria):
+    logger.info("[FFilms.py]==> newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://ffilms.org/italiano"
+            item.action = "peliculas"
+            item.extra=" Ultimi video"
+            itemlist = peliculas(item)
+
+            if itemlist[-1].action == "peliculas":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
 
     return itemlist
 

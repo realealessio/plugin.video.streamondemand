@@ -68,6 +68,29 @@ def mainlist(item):
     return itemlist
 
 
+def newest(categoria):
+    logger.info("streamondemand.streamblog newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "https://www.streamblog.me"
+            item.action = "peliculas"
+            item.extra = "movie"
+            itemlist = peliculas(item)
+
+            if itemlist[-1].action == "peliculas":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
 def categorias(item):
     itemlist = []
 

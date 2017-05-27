@@ -55,6 +55,31 @@ def mainlist(item):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
+def newest(categoria):
+    logger.info("[FilmStreamingGratis.py]==> newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://www.filmstreaminggratis.org"
+            item.action = "ultimifilm"
+            itemlist = ultimifilm(item)
+
+            if itemlist[-1].action == "ultimifilm":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
+# ================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------
 def search(item, texto):
     logger.info("[FilmStreamingGratis.py]==> search")
     item.url = host + "/?s=" + texto
@@ -177,7 +202,8 @@ def findvideos(item):
     itemlist = servertools.find_video_items(data=data)
 
     for videoitem in itemlist:
-        videoitem.title = "".join([item.title, color(videoitem.title, "orange")])
+        server = re.sub(r'[-\[\]\s]+', '', videoitem.title)
+        videoitem.title = "".join(["[%s] " % color(server, 'orange'), item.title])
         videoitem.fulltitle = item.fulltitle
         videoitem.show = item.show
         videoitem.thumbnail = item.thumbnail

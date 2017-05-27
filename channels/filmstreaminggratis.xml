@@ -11,9 +11,9 @@
     <bannermenu>http://www.filmstreaminggratis.org/wp-content/uploads/2016/10/filmstreaminglogo.png</bannermenu>
 
     <update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-    <version>1</version>
-    <date>26/02/2017</date>
-    <changes>new channel</changes>
+    <version>2</version>
+    <date>26/05/2017</date>
+    <changes>Added newest</changes>
 
     <categories>
         <category>movie</category>
@@ -23,6 +23,15 @@
 		<id>include_in_global_search</id>
 		<type>bool</type>
 		<label>Includi ricerca globale</label>
+		<default>true</default>
+		<enabled>true</enabled>
+		<visible>true</visible>
+	</settings>
+
+	<settings>
+		<id>include_in_newest_peliculas</id>
+		<type>bool</type>
+		<label>Includi in novità - film</label>
 		<default>true</default>
 		<enabled>true</enabled>
 		<visible>true</visible>

@@ -40,12 +40,12 @@ def mainlist(item):
     itemlist = [Item(channel=__channel__,
                      action="nuoveserie",
                      title=color("Nuove serie TV", "orange"),
-                     url=host,
+                     url="%s/lista-serie-tv" % host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
                      action="serietvaggiornate",
                      title=color("Serie TV Aggiornate", "azure"),
-                     url=host,
+                     url="%s/lista-serie-tv" % host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
                      action="lista_serie",
@@ -61,6 +61,31 @@ def mainlist(item):
                      action="search",
                      title=color("Cerca ...", "yellow"),
                      thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search")]
+
+    return itemlist
+
+# ================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------
+def newest(categoria):
+    logger.info("[GuardaSerieOnline.py]==> newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "series":
+            item.url = "http://www.guardaserie.online/lista-serie-tv"
+            item.action = "serietvaggiornate"
+            itemlist = serietvaggiornate(item)
+
+            if itemlist[-1].action == "serietvaggiornate":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
 
     return itemlist
 
@@ -117,28 +142,29 @@ def serietvaggiornate(item):
     itemlist = []
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
-    blocco = scrapertools.get_match(data, '<div\s*class="container container-title-serie-lastep  container-scheda" meta-slug="lastep">(.*?)</div></div><div')
-    patron = r'<a\s*.*?href="([^"]+)".*?> <img\s*.*?src="([^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>'
-    patron += r'[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p>'
+    blocco = scrapertools.get_match(data, r'<div\s*class="container container-title-serie-lastep  container-scheda" meta-slug="lastep">(.*?)</div></div><div')
+
+    patron = r'<a\s*rel="nofollow" href="([^"]+)"[^>]+> <img\s*.*?src="([^"]+)"[^>]+>[^>]+>'
+    patron += r'[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)<[^>]+>'
     matches = re.compile(patron, re.DOTALL).findall(blocco)
 
     for scrapedurl, scrapedthumbnail, scrapedep, scrapedtitle in matches:
-        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
         if DEBUG: logger.info("Scrapedurl: " + scrapedurl + " | ScrapedThumbnail: " + scrapedthumbnail + " | ScrapedEp: " + scrapedep + " | ScrapedTitle: " + scrapedtitle)
-        if "toroadvertisingmedia" in scrapedurl:
-            scrapedurl = host + "/" + scrapedtitle.replace(" ", "-")
+        episode = re.compile(r'^(\d+)x(\d+)', re.DOTALL).findall(scrapedep) # Prendo stagione ed episodio
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+        title = "%s %s" % (scrapedtitle, scrapedep)
+        extra = r'<span\s*.*?meta-stag="%s" meta-ep="%s" meta-embed="([^"]+)">' % (episode[0][0], episode[0][1].lstrip("0"))
         itemlist.append(infoSod(
             Item(channel=__channel__,
-                 action="episodi",
+                 action="findvideos",
                  contentType="tv",
-                 title="%s - %s" % (scrapedtitle, scrapedep),
+                 title=title,
+                 show=title,
                  fulltitle=scrapedtitle,
                  url=scrapedurl,
-                 extra="tv",
-                 show=scrapedtitle,
+                 extra=extra,
                  thumbnail=scrapedthumbnail,
                  folder=True), tipo="tv"))
-
     return itemlist
 
 # ================================================================================================================
@@ -149,8 +175,8 @@ def categorie(item):
     itemlist = []
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
-    blocco = scrapertools.get_match(data, '<div\s*class="bottom-header-category hidden-xs"><div\s*class="row">(.*?)</div></div></div><div')
-    patron = '<div\s*class="col-sm-3">\s+<a\s*href="([^"]+)".*?>([^<]+)</a></div>'
+    blocco = scrapertools.get_match(data, r'<table\s*class="table table-striped table-condensed"><tbody\s*style="font-size:13px;">(.*?)</tbody></table></div>')
+    patron = r'<a\s*class="link-categories-home" href="([^"]+)"[^>]+>([^<]+)</a>'
     matches = re.compile(patron, re.DOTALL).findall(blocco)
 
     for scrapedurl, scrapedtitle in matches:
@@ -175,8 +201,8 @@ def lista_serie(item):
     
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
 
-    patron = '<a\s*href="([^"]+)".*?>\s*<img\s*.*?src="([^"]+)" />[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p></div>'
-    blocco = scrapertools.get_match(data, '<div\s*class="col-xs-\d+ col-sm-\d+-\d+">(.*?)<div\s*class="container-fluid whitebg" style="">')
+    patron = r'<a\s*href="([^"]+)".*?>\s*<img\s*.*?src="([^"]+)" />[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</p></div>'
+    blocco = scrapertools.get_match(data, r'<div\s*class="col-xs-\d+ col-sm-\d+-\d+">(.*?)<div\s*class="container-fluid whitebg" style="">')
     matches = re.compile(patron, re.DOTALL).findall(blocco)
     
     for scrapedurl, scrapedimg, scrapedtitle in matches:
@@ -202,9 +228,9 @@ def episodi(item):
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
 
-    patron = '<img\s*.*?[meta-src|data-original]*="([^"]+)"\s*/>[^>]+>([^<]+)<[^>]+>[^>]+>[^>]+>'
-    patron += '[^>]+>[^>]+>([^<]+)*<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'
-    patron += '[^>]+>[^>]+>[^>]+>\s*<span\s*.*?(meta-embed="[^"]+">)'
+    patron = r'<img\s*.*?[meta-src|data-original]*="([^"]+)"\s*/>[^>]+>([^<]+)<[^>]+>[^>]+>[^>]+>'
+    patron += r'[^>]+>[^>]+>([^<]+)*<[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>'
+    patron += r'[^>]+>[^>]+>[^>]+>\s*<span\s*.*?(meta-embed="[^"]+">)'
     matches = re.compile(patron, re.DOTALL).findall(data)
     for scrapedthumbnail, scrapedep, scrapedeptitle, scrapedextra in matches:
         scrapedeptitle = scrapertools.decodeHtmlentities(scrapedeptitle).strip()
@@ -215,6 +241,7 @@ def episodi(item):
                  action="findvideos",
                  title=scrapedtitle,
                  fulltitle=scrapedtitle,
+                 url="",
                  contentType="episode",
                  extra=scrapedextra,
                  thumbnail=scrapedthumbnail,
@@ -242,17 +269,30 @@ def episodi(item):
 # ----------------------------------------------------------------------------------------------------------------
 def findvideos(item):
     logger.info("[GuardaSerieOnline.py]==> findvideos")
-    itemlist = servertools.find_video_items(data=item.extra)
 
-    # Non sono riuscito a trovare un modo migliore di questo, se qualcuno ha un metodo migliore di questo
-    # per estrarre il video lo sistemi per favore.
-    if len(itemlist) > 1:
-        itemlist.remove(itemlist[1])
-    itemlist[0].title = "".join([item.title, color(itemlist[0].title, "orange")])
-    itemlist[0].fulltitle = item.fulltitle
-    itemlist[0].show = item.show
-    itemlist[0].thumbnail = item.thumbnail
-    itemlist[0].channel = __channel__
+    try:
+        if item.url:
+            data = scrapertools.anti_cloudflare(item.url, headers=headers)
+            data = scrapertools.find_single_match(data, item.extra)
+            itemlist = servertools.find_video_items(data=data)
+        else:
+            itemlist = servertools.find_video_items(data=item.extra)
+
+        # Non sono riuscito a trovare un modo migliore di questo, se qualcuno ha un metodo migliore di questo
+        # per estrarre il video lo sistemi per favore.
+        if len(itemlist) > 1:
+            itemlist.remove(itemlist[1])
+        server = re.sub(r'[-\[\]\s]+', '', itemlist[0].title)
+        itemlist[0].title = "".join(["[%s] " % color(server, 'orange'), item.title])
+        itemlist[0].fulltitle = item.fulltitle
+        itemlist[0].show = item.show
+        itemlist[0].thumbnail = item.thumbnail
+        itemlist[0].channel = __channel__
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("%s" % line)
+        return []
     return itemlist
 
 # ================================================================================================================
@@ -260,9 +300,5 @@ def findvideos(item):
 # ----------------------------------------------------------------------------------------------------------------
 def color(text, color):
     return "[COLOR "+color+"]"+text+"[/COLOR]"
-
-def HomePage(item):
-    import xbmc
-    xbmc.executebuiltin("ReplaceWindow(10024,plugin://plugin.video.streamondemand)")
 
 # ================================================================================================================

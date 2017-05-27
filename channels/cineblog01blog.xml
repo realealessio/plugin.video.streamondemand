@@ -11,9 +11,9 @@
     <bannermenu>https://www.cineblog01.blog/templates/cineblog01/images/logo.png</bannermenu>
 
     <update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-    <version>1</version>
-    <date>07/05/2017</date>
-    <changes>Versione iniziale</changes>
+    <version>2</version>
+    <date>25/05/2017</date>
+    <changes>Added newest</changes>
 
     <categories>
         <category>movie</category>
@@ -26,5 +26,14 @@
 		<default>false</default>
 		<enabled>false</enabled>
 		<visible>false</visible>
+	</settings>
+
+	<settings>
+		<id>include_in_newest_peliculas</id>
+		<type>bool</type>
+		<label>Includi in novità - film</label>
+		<default>true</default>
+		<enabled>true</enabled>
+		<visible>true</visible>
 	</settings>
 </channel>

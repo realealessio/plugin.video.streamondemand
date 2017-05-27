@@ -69,6 +69,28 @@ def mainlist(item):
     return itemlist
 
 
+def newest(categoria):
+    logger.info("[filmsenzalimiti.py] newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "peliculas":
+            item.url = "http://www.filmsenzalimiti.cool/genere/film"
+            item.action = "novedades"
+            itemlist = novedades(item)
+
+            if itemlist[-1].action == "novedades":
+                itemlist.pop()
+
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
+
 def categorias(item):
     logger.info("[filmsenzalimiti.py] novedades")
     itemlist = []
