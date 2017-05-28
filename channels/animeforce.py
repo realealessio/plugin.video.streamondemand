@@ -15,6 +15,7 @@ from core import logger
 from core import scrapertools
 from core import servertools
 from core.item import Item
+from core.tmdb import infoSod
 from servers import adfly
 
 __channel__ = "animeforce"
@@ -28,7 +29,7 @@ DEBUG = config.get_setting("debug")
 host = "http://animeforce.org"
 
 headers = [
-    ['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0'],
+    ['User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:53.0) Gecko/20100101 Firefox/53.0'],
     ['Accept-Encoding', 'gzip, deflate'],
     ['Referer', host]
 ]
@@ -48,12 +49,48 @@ def mainlist(item):
                      thumbnail=CategoriaThumbnail,
                      fanart=CategoriaFanart),
                 Item(channel=__channel__,
+                     action="animeaggiornati",
+                     title="[COLOR azure]Anime Aggiornati[/COLOR]",
+                     url=host,
+                     thumbnail=CategoriaThumbnail,
+                     fanart=CategoriaFanart),
+                Item(channel=__channel__,
+                     action="ultimiep",
+                     title="[COLOR azure]Ultimi Episodi[/COLOR]",
+                     url=host,
+                     thumbnail=CategoriaThumbnail,
+                     fanart=CategoriaFanart),
+                Item(channel=__channel__,
                      action="search",
                      title="[COLOR yellow]Cerca ...[/COLOR]",
                      thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search")]
 
     return itemlist
 
+
+# =================================================================
+
+# -----------------------------------------------------------------
+def newest(categoria):
+    log("newest", "newest" + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "anime":
+            item.url = "http://animeforce.org"
+            item.action = "ultimiep"
+            itemlist = ultimiep(item)
+
+            if itemlist[-1].action == "ultimiep":
+                itemlist.pop()
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
+
+    return itemlist
 
 # =================================================================
 
@@ -93,6 +130,82 @@ def search_anime(item):
                     fulltitle=scrapedtitle,
                     show=scrapedtitle,
                     thumbnail=scrapedthumbnail))
+
+    return itemlist
+
+
+# =================================================================
+
+# -----------------------------------------------------------------
+def animeaggiornati(item):
+    log("animeaggiornati", "animeaggiornati")
+    itemlist = []
+
+    data = scrapertools.cache_page(item.url, headers=headers)
+
+    blocco = scrapertools.get_match(data, r'<div class="main-loop-inner">(.*?)<br class="clearer"/>\s*</div>')
+
+    patron = r'<img.*?src="([^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><a href="([^"]+)">([^<]+)</a>'
+    matches = re.compile(patron, re.DOTALL).findall(data)
+
+    for scrapedthumbnail, scrapedurl, scrapedtitle in matches:
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+        if 'Streaming' in scrapedtitle:
+            # Pulizia titolo
+            cleantitle = scrapedtitle.replace("Streaming", "").replace("&", "")
+            cleantitle = cleantitle.replace("Download", "")
+            cleantitle = cleantitle.replace("Sub Ita", "")
+            cleantitle = re.sub(r'Episodio?\s*\d+\s*(?:\(\d+\)|)\s*[\(OAV\)]*', '', cleantitle)
+            # Creazione URL
+            scrapedurl = re.sub(r'episodio?-?\d+-?(?:\d+-|)[oav]*', '', scrapedurl)
+            itemlist.append(infoSod(
+                Item(channel=__channel__,
+                    action="episodios",
+                    title=cleantitle,
+                    url=scrapedurl,
+                    fulltitle=cleantitle,
+                    show=cleantitle,
+                    thumbnail=scrapedthumbnail), tipo="tv"))
+
+    return itemlist
+
+
+# =================================================================
+
+# -----------------------------------------------------------------
+def ultimiep(item):
+    log("ultimiep", "ultimiep")
+    itemlist = []
+
+    data = scrapertools.cache_page(item.url, headers=headers)
+
+    blocco = scrapertools.get_match(data, r'<div class="main-loop-inner">(.*?)<br class="clearer"/>\s*</div>')
+
+    patron = r'<img.*?src="([^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><a href="([^"]+)">([^<]+)</a>'
+    matches = re.compile(patron, re.DOTALL).findall(data)
+
+    for scrapedthumbnail, scrapedurl, scrapedtitle in matches:
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+        if 'Streaming' in scrapedtitle:
+            # Pulizia titolo
+            scrapedtitle = scrapedtitle.replace("Streaming", "").replace("&", "")
+            scrapedtitle = scrapedtitle.replace("Download", "")
+            scrapedtitle = scrapedtitle.replace("Sub Ita", "").strip()
+            cleantitle = re.sub(r'Episodio?\s*\d+\s*(?:\(\d+\)|)', '', scrapedtitle).strip()
+            # Creazione URL
+            episodio = scrapertools.find_single_match(scrapedtitle.lower(), r'episodio?\s*(\d+)')
+            scrapedurl = re.sub(r'episodio?-?\d+-?(?:\d+-|)[oav]*', '', scrapedurl)
+            extra = "<tr>\s*<td[^>]+><strong>Episodio %s[^<]*</strong></td>" % episodio
+            print "EPISODIO: " + episodio + "\nTITLE: " + scrapedtitle + "\nExtra: " + extra + "\nURL: " + scrapedurl
+            itemlist.append(infoSod(
+                Item(channel=__channel__,
+                    action="findvideos",
+                    title=scrapedtitle,
+                    url=scrapedurl,
+                    fulltitle=cleantitle,
+                    extra=extra,
+                    show=re.sub(r'Episodio\s*', '', scrapedtitle),
+                    thumbnail=scrapedthumbnail), tipo="tv"))
 
     return itemlist
 
@@ -177,11 +290,19 @@ def episodios(item):
 
 # -----------------------------------------------------------------
 def findvideos(item):
-    logger.info("streamondemand.animeinstreaming play")
+    logger.info("streamondemand.animeforce findvideos")
 
     itemlist = []
 
-    url = item.url
+    if item.extra:
+        data = scrapertools.cache_page(item.url, headers=headers)
+
+        blocco = scrapertools.get_match(data, r'%s(.*?)</tr>' % item.extra)
+        scrapedurl = scrapertools.find_single_match(blocco, r'<a href="([^"]+)"[^>]+>')
+        url = scrapedurl
+    else:
+        url = item.url
+
     if 'adf.ly' in url:
         url = adfly.get_long_url(url)
     elif 'bit.ly' in url:

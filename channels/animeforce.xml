@@ -12,9 +12,9 @@
 	<bannermenu>http://www.animeforce.org/wp-content/uploads/2013/10/AF.png</bannermenu>
 
 	<update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-	<version>6</version>
-	<date>30/04/2017</date>
-	<changes>Small Fix</changes>
+	<version>7</version>
+	<date>28/05/2017</date>
+	<changes>Added newest for novedades, Added latest episode, Added updated anime</changes>
 
 	<categories>
 		<category>anime</category>
@@ -27,5 +27,14 @@
 		<default>false</default>
 		<enabled>false</enabled>
 		<visible>false</visible>
+	</settings>
+
+	<settings>
+		<id>include_in_newest_anime</id>
+		<type>bool</type>
+		<label>Includi in novità - Anime</label>
+		<default>true</default>
+		<enabled>true</enabled>
+		<visible>true</visible>
 	</settings>
 </channel>
