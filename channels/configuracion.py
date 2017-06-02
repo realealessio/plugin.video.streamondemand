@@ -89,7 +89,7 @@ def mainlist(item):
                         channel_parameters = channeltools.get_channel_parameters(channel.channel)
                         active_status = channel_parameters['active']
 
-                    if active_status == "true":
+                    if active_status == True:
                         itemlist.append(Item(channel=CHANNELNAME,
                                              title="   Configurazione canale '%s'" % channel.title,
                                              action="channel_config", config=channel.channel,

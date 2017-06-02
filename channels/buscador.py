@@ -97,11 +97,11 @@ def settingCanal(item):
         channel_parameters = channeltools.get_channel_parameters(channel_name)
 
         # No incluir si es un canal inactivo
-        if channel_parameters["active"] != "true":
+        if channel_parameters["active"] != True:
             continue
 
         # No incluir si es un canal para adultos, y el modo adulto está desactivado
-        if channel_parameters["adult"] == "true" and config.get_setting("adult_mode") == "false":
+        if channel_parameters["adult"] == True and config.get_setting("adult_mode") == False:
             continue
 
         # No incluir si el canal es en un idioma filtrado
@@ -110,7 +110,7 @@ def settingCanal(item):
 
         # No incluir si en la configuracion del canal no existe "include_in_global_search"
         include = channel_parameters["include_in_global_search"]
-        if include not in ["", "true"]:
+        if include not in ["", True]:
             continue
         else:
             # Se busca en la configuración del canal el valor guardado
@@ -220,7 +220,7 @@ def do_search(item):
         channel_parameters = channeltools.get_channel_parameters(basename_without_extension)
 
         # No busca si es un canal inactivo
-        if channel_parameters["active"] != "true":
+        if channel_parameters["active"] != True:
             continue
 
         # En caso de busqueda por categorias
@@ -228,7 +228,7 @@ def do_search(item):
             continue
 
         # No busca si es un canal para adultos, y el modo adulto está desactivado
-        if channel_parameters["adult"] == "true" and config.get_setting("adult_mode") == "false":
+        if channel_parameters["adult"] == True and config.get_setting("adult_mode") == False:
             continue
 
         # No busca si el canal es en un idioma filtrado
@@ -237,13 +237,13 @@ def do_search(item):
 
         # No busca si es un canal excluido de la busqueda global
         include_in_global_search = channel_parameters["include_in_global_search"]
-        if include_in_global_search in ["", "true"]:
+        if include_in_global_search in ["", True]:
             # Buscar en la configuracion del canal
             include_in_global_search = str(config.get_setting("include_in_global_search", basename_without_extension))
             # Si no hay valor en la configuración del canal se incluye ya que así estaba por defecto
             '''if include_in_global_search == "":
-                include_in_global_search = "true"'''
-        if include_in_global_search.lower() != "true":
+                include_in_global_search = True'''
+        if include_in_global_search.lower() != True:
             continue
 
         t = Thread(target=channel_search, args=[search_results, channel_parameters, category, tecleado])

@@ -39,7 +39,7 @@ def is_adult(channel_name):
 
     channel_parameters = get_channel_parameters(channel_name)
 
-    return channel_parameters["adult"] == "true"
+    return channel_parameters["adult"] == True
 
 
 def get_channel_parameters(channel_name):

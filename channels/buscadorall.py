@@ -45,7 +45,7 @@ TMDB_KEY = 'f7f51775877e0bb6703520952b3c7840'
 
 TMDB_URL_BASE = 'http://api.themoviedb.org/3/'
 TMDB_IMAGES_BASEURL = 'http://image.tmdb.org/t/p/'
-INCLUDE_ADULT = 'true' if config.get_setting("enableadultmode") else 'false'
+INCLUDE_ADULT = True if config.get_setting("enableadultmode") else False
 LANGUAGE_ID = 'it'
 
 DTTIME = (datetime.datetime.utcnow() - datetime.timedelta(hours=5))
@@ -643,7 +643,7 @@ def do_channels_search(item):
         channel_parameters = channeltools.get_channel_parameters(basename_without_extension)
 
         # No busca si es un canal inactivo
-        if channel_parameters["active"] != "true":
+        if channel_parameters["active"] != True:
             continue
 
         # En caso de busqueda por categorias
@@ -651,7 +651,7 @@ def do_channels_search(item):
             continue
 
         # No busca si es un canal para adultos, y el modo adulto está desactivado
-        if channel_parameters["adult"] == "true" and config.get_setting("adult_mode") == "false":
+        if channel_parameters["adult"] == True and config.get_setting("adult_mode") == False:
             continue
 
         # No busca si el canal es en un idioma filtrado
@@ -663,7 +663,7 @@ def do_channels_search(item):
         if include_in_global_search == "":
             # Buscar en la configuracion del canal
             include_in_global_search = str(config.get_setting("include_in_global_search", basename_without_extension))
-        if include_in_global_search.lower() != "true":
+        if include_in_global_search.lower() != True:
             continue
 
         t = Thread(target=channel_search, args=[search_results, channel_parameters, category, title_year, tecleado])

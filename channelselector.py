@@ -89,7 +89,7 @@ def getchanneltypes(preferred_thumb=""):
                 logger.info("channelselector.filterchannels channel_parameters=" + repr(channel_parameters))
 
                 # Si es un canal para adultos y el modo adulto está desactivado, se lo salta
-                if channel_parameters["adult"] == "true" and config.get_setting("adult_mode") == "false":
+                if channel_parameters["adult"] == True and config.get_setting("adult_mode") == False:
                     continue
 
                 # Si el canal está en un idioma filtrado
@@ -153,10 +153,10 @@ def filterchannels(category,preferred_thumb=""):
     channelslist =[]
 
     # Si category = "allchannelstatus" es que estamos activando/desactivando canales
-    appenddisabledchannels = "false"
+    appenddisabledchannels = False
     if category == "allchannelstatus":
         category = "all"
-        appenddisabledchannels = "true"
+        appenddisabledchannels = True
 
     # Lee la lista de canales
     channel_path = os.path.join( config.get_runtime_path() , "channels" , '*.xml' )
@@ -190,12 +190,12 @@ def filterchannels(category,preferred_thumb=""):
                 else:
                     channel_status = channel_parameters["active"]
 
-                if channel_status != "true":
-                    if appenddisabledchannels != "true":
+                if channel_status != True:
+                    if appenddisabledchannels != True:
                         continue
 
                 # Se salta el canal para adultos si el modo adultos está desactivado
-                if channel_parameters["adult"] == "true" and config.get_setting("adult_mode") != "true": 
+                if channel_parameters["adult"] == True and config.get_setting("adult_mode") != True: 
                     continue
 
                 # Se salta el canal si está en un idioma filtrado
@@ -222,15 +222,15 @@ def filterchannels(category,preferred_thumb=""):
     channelslist.sort(key=lambda item: item.title.lower().strip())
 
     if category=="all":
-        if config.get_setting("personalchannel5")=="true":
+        if config.get_setting("personalchannel5")==True:
             channelslist.insert( 0 , Item( title=config.get_setting("personalchannelname5") ,action="mainlist", channel="personal5" ,thumbnail=config.get_setting("personalchannellogo5") , type="generic" ,viewmode="list" ))
-        if config.get_setting("personalchannel4")=="true":
+        if config.get_setting("personalchannel4")==True:
             channelslist.insert( 0 , Item( title=config.get_setting("personalchannelname4") ,action="mainlist", channel="personal4" ,thumbnail=config.get_setting("personalchannellogo4") , type="generic" ,viewmode="list" ))
-        if config.get_setting("personalchannel3")=="true":
+        if config.get_setting("personalchannel3")==True:
             channelslist.insert( 0 , Item( title=config.get_setting("personalchannelname3") ,action="mainlist", channel="personal3" ,thumbnail=config.get_setting("personalchannellogo3") , type="generic" ,viewmode="list" ))
-        if config.get_setting("personalchannel2")=="true":
+        if config.get_setting("personalchannel2")==True:
             channelslist.insert( 0 , Item( title=config.get_setting("personalchannelname2") ,action="mainlist", channel="personal2" ,thumbnail=config.get_setting("personalchannellogo2") , type="generic" ,viewmode="list" ))
-        if config.get_setting("personalchannel")=="true":
+        if config.get_setting("personalchannel")==True:
             channelslist.insert( 0 , Item( title=config.get_setting("personalchannelname")  ,action="mainlist", channel="personal"  ,thumbnail=config.get_setting("personalchannellogo") , type="generic" ,viewmode="list" ))
 
         channel_parameters = channeltools.get_channel_parameters("tengourl")

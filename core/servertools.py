@@ -211,10 +211,10 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
 
             # Cuenta las opciones disponibles, para calcular el porcentaje
             opciones = []
-            if server_parameters["free"] == "true":
+            if server_parameters["free"] == True:
                 opciones.append("free")
             opciones.extend([premium for premium in server_parameters["premium"] if
-                             config.get_setting(premium + "premium") == "true"])
+                             config.get_setting(premium + "premium") == True])
             logger.info("streamondemand.core.servertools opciones disponibles para " + server + ": " + str(
                 len(opciones)) + " " + str(opciones))
 
@@ -239,7 +239,7 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
                     logger.info("streamondemand.core.servertools test_video_exists dice que el video SI existe")
 
             # Obtiene enlaces free
-            if server_parameters["free"] == "true":
+            if server_parameters["free"] == True:
                 if muestra_dialogo:
                     progreso.update((100 / len(opciones)) * opciones.index("free"), "Connessione con " + server)
 
@@ -254,7 +254,7 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
             # Obtiene enlaces para las diferentes opciones premium
             error_message = []
             for premium in server_parameters["premium"]:
-                if config.get_setting(premium + "premium") == "true":
+                if config.get_setting(premium + "premium") == True:
                     if muestra_dialogo:
                         progreso.update((100 / len(opciones)) * opciones.index(premium), "Connessione con " + premium)
                     exec "from servers import " + premium + " as premium_conector"
@@ -318,14 +318,14 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
 def is_server_enabled(server):
     try:
         server_parameters = get_server_parameters(server)
-        if server_parameters["active"] == "true":
-            if not config.get_setting("hidepremium") == "true":
+        if server_parameters["active"] == True:
+            if not config.get_setting("hidepremium") == True:
                 return True
             else:
-                if server_parameters["free"] == "true":
+                if server_parameters["free"] == True:
                     return True
                 if [premium for premium in server_parameters["premium"] if
-                    config.get_setting(premium + "premium") == "true"]:
+                    config.get_setting(premium + "premium") == True]:
                     return True
                 else:
                     return False

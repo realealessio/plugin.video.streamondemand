@@ -23,7 +23,7 @@ def search(item, texto):
     for file in files:
         file = file.replace(".xml", "")
         channel_parameters = channeltools.get_channel_parameters(file)
-        if channel_parameters['active'] == "true":
+        if channel_parameters['active'] == True:
             file = os.path.basename(file)
             if DEBUG: logger.info("File .xml trovato: " + file)
             texto = texto.lower().replace("+", "")
