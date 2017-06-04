@@ -104,7 +104,7 @@ def anti_cloudflare(url, headers=None, post=None):
 def printMatches(matches):
     i = 0
     for match in matches:
-        logger.info("streamondemand.core.scrapertools %d %s" % (i , match))
+        logger.info("%d %s" % (i, match))
         i = i + 1
 
 def get_match(data,patron,index=0):
@@ -143,7 +143,7 @@ def unescape(text):
                     return unichr(int(text[2:-1])).encode("utf-8")
 
             except ValueError:
-                logger.info("error de valor")
+                logger.error("error de valor")
                 pass
         else:
             # named entity
@@ -162,7 +162,7 @@ def unescape(text):
                 import htmlentitydefs
                 text = unichr(htmlentitydefs.name2codepoint[text[1:-1]]).encode("utf-8")
             except KeyError:
-                logger.info("keyerror")
+                logger.error("keyerror")
                 pass
             except:
                 pass

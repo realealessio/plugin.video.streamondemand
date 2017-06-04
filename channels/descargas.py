@@ -25,18 +25,18 @@
 # Gestor de descargas
 # ------------------------------------------------------------
 import os
-import sys
 import re
-from core import config
-from core.downloader import Downloader
-from core import scrapertools
-from core import logger
-from core import servertools
-from core import filetools
-from platformcode import platformtools
-from core.item import Item
 import time
+
+from core import config
+from core import filetools
+from core import logger
 from core import scraper
+from core import scrapertools
+from core import servertools
+from core.downloader import Downloader
+from core.item import Item
+from platformcode import platformtools
 
 STATUS_COLORS = {0: "orange", 1: "orange", 2: "green", 3: "red"}
 STATUS_CODES = type("StatusCode",(), {"stoped" : 0, "canceled" : 1 , "completed" : 2, "error" : 3})
@@ -566,13 +566,7 @@ def download_from_best_server(item, ask = False):
     play_items = filter(lambda x: x.action == "play", play_items)
 
     progreso.update(100, "Lista dei server disponibili.", "Server disponibili: %s" % len(play_items), "Identificando servidores...")
-    
-    for i in play_items:
-      if not i.server:
-        i.server = servertools.get_server_from_url(i.url)
-        if progreso.iscanceled():
-          return {"downloadStatus": STATUS_CODES.canceled}
-        
+       
     play_items.sort(key=sort_method)
     
     if progreso.iscanceled():
@@ -689,7 +683,7 @@ def get_episodes(item):
 
       
 def write_json(item):
-    logger.info("streamondemand.channels.descargas write_json")
+    logger.info()
   
     item.action = "menu"
     item.channel = "descargas"

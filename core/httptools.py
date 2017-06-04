@@ -24,17 +24,18 @@
 # --------------------------------------------------------------------------------
 # httptools
 # --------------------------------------------------------------------------------
+import cookielib
+import gzip
+import os
+import time
 import urllib
 import urllib2
 import urlparse
-import cookielib
-import os
-import time
 from StringIO import StringIO
-import gzip
-from core import logger
-from core import config
 from threading import Lock
+
+from core import config
+from core import logger
 from core.cloudflare import Cloudflare
 
 cookies_lock = Lock()
@@ -104,7 +105,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     @type replace_headers: bool
     @param add_referer: Indica si se ha de añadir el header "Referer" usando el dominio de la url como valor.
     @type add_referer: bool
-    @param only_headers: Si Ture, solo se descargarán los headers, omitiendo el contenido de la url.
+    @param only_headers: Si True, solo se descargarán los headers, omitiendo el contenido de la url.
     @type only_headers: bool
     @return: Resultado de la petición
     @rtype: HTTPResponse

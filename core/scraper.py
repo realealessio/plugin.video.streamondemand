@@ -283,6 +283,7 @@ def get_nfo(item):
     else:
         return scraper.get_nfo(item)
 
+
 def sort_episode_list(episodelist):
     scraper_actual = ['tmdb', 'tvdb'][config.get_setting("scraper_tvshows", "biblioteca")]
 

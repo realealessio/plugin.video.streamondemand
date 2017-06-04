@@ -26,7 +26,6 @@
 # ------------------------------------------------------------
 
 import os
-import sys
 import threading
 import urllib2
 
@@ -36,22 +35,6 @@ from core import filetools
 from core import jsontools
 from core import logger
 from platformcode import platformtools
-
-
-addon_name = sys.argv[0].strip()
-if not addon_name or addon_name.startswith("default.py"):
-    addon_name = "plugin://plugin.video.streamondemand/"
-
-if config.get_setting("folder_movies") != "":
-    FOLDER_MOVIES = config.get_setting("folder_movies")
-else:
-    FOLDER_MOVIES = "CINE"  # config.get_localized_string(30072)
-
-if config.get_setting("folder_tvshows") != "":
-    FOLDER_TVSHOWS = config.get_setting("folder_tvshows")
-else:
-    FOLDER_TVSHOWS = "SERIES"  # config.get_localized_string(30073)
-
 
 
 def mark_auto_as_watched(item):
@@ -100,7 +83,8 @@ def mark_auto_as_watched(item):
     if config.get_setting("mark_as_watched", "biblioteca"):
         threading.Thread(target=mark_as_watched_subThread, args=[item]).start()
 
-def sync_trakt_streamondemand(path_folder):
+
+def sync_trakt_pelisalacarta(path_folder):
     """
        Actualiza los valores de episodios vistos si  
     """
@@ -224,6 +208,7 @@ def sync_trakt_streamondemand(path_folder):
                 import traceback
                 logger.error(traceback.format_exc())
 
+
 def sync_trakt_kodi(silent=True):
 
     # Para que la sincronizacion no sea silenciosa vale con silent=False
@@ -333,7 +318,7 @@ def mark_season_as_watched_on_kodi(item, value=1):
     if item.contentSeason > -1:
         request_season = ' and c12= %s' % item.contentSeason
 
-    tvshows_path = filetools.join(config.get_library_path(), FOLDER_TVSHOWS)
+    tvshows_path = filetools.join(config.get_library_path(), config.get_setting("folder_tvshows"))
     item_path1 = "%" + item.path.replace("\\\\", "\\").replace(tvshows_path, "")
     if item_path1[:-1] != "\\":
         item_path1 += "\\"
@@ -360,7 +345,7 @@ def get_data(payload):
     if config.get_setting("library_mode", "biblioteca"):
         try:
             try:
-                xbmc_port = int(config.get_setting("xbmc_puerto", "biblioteca"))
+                xbmc_port = config.get_setting("xbmc_puerto", "biblioteca")
             except:
                 xbmc_port = 0
 
@@ -376,7 +361,7 @@ def get_data(payload):
         except Exception, ex:
             template = "An exception of type {0} occured. Arguments:\n{1!r}"
             message = template.format(type(ex).__name__, ex.args)
-            logger.info("get_data: error en xbmc_json_rpc_url: %s" % message)
+            logger.error("get_data: error en xbmc_json_rpc_url: %s" % message)
             data = ["error"]
     else:
         try:
@@ -384,7 +369,7 @@ def get_data(payload):
         except Exception, ex:
             template = "An exception of type {0} occured. Arguments:\n{1!r}"
             message = template.format(type(ex).__name__, ex.args)
-            logger.info("get_data:: error en xbmc.executeJSONRPC: {0}".
+            logger.error("get_data:: error en xbmc.executeJSONRPC: {0}".
                         format(message))
             data = ["error"]
 
@@ -393,7 +378,7 @@ def get_data(payload):
     return data
 
 
-def update(folder_content=FOLDER_TVSHOWS, folder=""):
+def update(folder_content=config.get_setting("folder_tvshows"), folder=""):
     """
     Actualiza la libreria dependiendo del tipo de contenido y la ruta que se le pase.
 
@@ -580,7 +565,6 @@ def set_content(content_type, silent=False):
 
         idPath = 0
         idParentPath = 0
-        strPath = ""
         if continuar:
             continuar = False
 
@@ -770,8 +754,6 @@ def add_sources(path):
     from xml.dom import minidom
 
     SOURCES_PATH = xbmc.translatePath("special://userdata/sources.xml")
-    xmldoc = None
-
 
     if os.path.exists(SOURCES_PATH):
         xmldoc = minidom.parse(SOURCES_PATH)
@@ -788,16 +770,17 @@ def add_sources(path):
             nodo_sources.appendChild(nodo_type)
         xmldoc.appendChild(nodo_sources)
 
-
     # Buscamos el nodo video
     nodo_video = xmldoc.childNodes[0].getElementsByTagName("video")[0]
 
     # Buscamos el path dentro de los nodos_path incluidos en el nodo_video
     nodos_paths = nodo_video.getElementsByTagName("path")
     list_path = [p.firstChild.data for p in nodos_paths]
+    logger.debug(list_path)
     if path in list_path:
         logger.debug("La ruta %s ya esta en sources.xml" % path)
         return
+    logger.debug("La ruta %s NO esta en sources.xml" % path)
 
     # Si llegamos aqui es por q el path no esta en sources.xml, asi q lo incluimos
     nodo_source = xmldoc.createElement("source")
@@ -836,16 +819,19 @@ def add_sources(path):
 
 
 def ask_set_content():
+    logger.info()
+    logger.debug("library_ask_set_content %s" % config.get_setting("library_ask_set_content"))
+    logger.debug("library_set_content %s" % config.get_setting("library_set_content"))
     # Si es la primera vez que se utiliza la biblioteca preguntar si queremos autoconfigurar
-    if config.get_setting("library_ask_set_content") == "true" and config.get_setting("library_set_content") == "false":
+    if config.get_setting("library_ask_set_content") == True and config.get_setting("library_set_content") == False:
         heading = "Streamondemand Auto-configurazione"
         linea1 = "Auto-configura la libreria di Kodi tramite Streamondemand?"
         linea2 = "E' possibile modifcare i path nelle Preferenze"
         if platformtools.dialog_yesno(heading, linea1, linea2):
-            config.set_setting("library_set_content", "true")
+            config.set_setting("library_set_content", True)
             config.set_setting("library_ask_set_content", "active")
             config.verify_directories_created()
 
-        config.set_setting("library_ask_set_content", "false")
+        config.set_setting("library_ask_set_content", False)
 
 

@@ -24,7 +24,6 @@
 
 	<include_in_global_search>disabled</include_in_global_search>
 
-
 	<settings>
 		<id>updatelibrary</id>
 		<type>list</type>
@@ -165,7 +164,6 @@
 		<visible>true</visible>
 		<default></default>
 	</settings>
-
 	<settings>
 		<id>mark_as_watched</id>
 		<type>bool</type>

@@ -39,7 +39,6 @@ from platformcode import platformtools
 
 result = None
 window_select = []
-DEBUG = config.get_setting("debug")
 # Para habilitar o no la opción de búsqueda manual
 if config.get_platform() != "plex":
     keyboard = True
@@ -48,7 +47,7 @@ else:
 
 
 def buscartrailer(item, trailers=[]):
-    logger.info("streamondemand.channels.trailertools buscartrailer")
+    logger.info()
 
     # Lista de acciones si se ejecuta desde el menú contextual
     if item.action == "manual_search" and item.contextual:
@@ -78,11 +77,11 @@ def buscartrailer(item, trailers=[]):
         else:
             fulltitle = re.sub('\[\/*(B|I|COLOR)\s*[^\]]*\]', '', item.fulltitle.strip())
             item.contentTitle = fulltitle
-        
-        item.year = item.infoLabels['year']
 
-        logger.info("streamondemand.channels.trailertools Búsqueda: %s" % item.contentTitle)
-        logger.info("streamondemand.channels.trailertools Año: %s" % item.year)
+        item.year = item.infoLabels['year']
+          
+        logger.info("Búsqueda: %s" % item.contentTitle)
+        logger.info("Año: %s" % item.year)
         if item.infoLabels['trailer'] and not trailers:
             url = item.infoLabels['trailer']
             if "youtube" in url:
@@ -134,7 +133,7 @@ def buscartrailer(item, trailers=[]):
 
 
 def manual_search(item):
-    logger.info("streamondemand.channels.trailertools manual_search")
+    logger.info()
     texto = platformtools.dialog_input(default=item.contentTitle, heading=config.get_localized_string(30112))
     if texto is not None:
         if item.extra == "abandomoviez":
@@ -148,7 +147,7 @@ def manual_search(item):
 
 
 def tmdb_trailers(item, tipo="movie"):
-    logger.info("streamondemand.channels.trailertools tmdb_trailers")
+    logger.info()
 
     from core.tmdb import Tmdb
     itemlist = []
@@ -168,7 +167,7 @@ def tmdb_trailers(item, tipo="movie"):
 
 
 def youtube_search(item):
-    logger.info("streamondemand.channels.trailertools youtube_search")
+    logger.info()
     itemlist = []
 
     titulo = item.contentTitle
@@ -220,7 +219,7 @@ def youtube_search(item):
 
 
 def abandomoviez_search(item):
-    logger.info("streamondemand.channels.trailertools abandomoviez_search")
+    logger.info()
 
     # Comprueba si es una búsqueda de cero o viene de la opción Siguiente
     if item.page != "":
@@ -334,7 +333,7 @@ def search_links_abando(item):
 
 
 def filmaffinity_search(item):
-    logger.info("streamondemand.channels.trailertools filmaffinity_search")
+    logger.info()
 
     if item.filmaffinity:
         item.url = item.filmaffinity
@@ -355,7 +354,7 @@ def filmaffinity_search(item):
     matches = scrapertools.find_multiple_matches(data, patron)
     # Si solo hay un resultado, busca directamente los trailers, sino lista todos los resultados
     if len(matches) == 1:
-        item.url = "http://www.filmaffinity.com/es/evideos.php?movie_id=%s" % matches[0][1]
+        item.url = "http://www.filmaffinity.com/en/evideos.php?movie_id=%s" % matches[0][1]
         item.thumbnail = matches[0][0]
         if not item.thumbnail.startswith("http"):
             item.thumbnail = "http://www.filmaffinity.com" + item.thumbnail
@@ -410,7 +409,7 @@ def search_links_filmaff(item):
                 code = scrapertools.find_single_match(trailer_url, 'v=([A-z0-9\-_]+)')
                 thumbnail = "https://img.youtube.com/vi/%s/0.jpg" % code
             else:
-                server = servertools.get_server_from_url(trailer_url)
+                server = ""
                 thumbnail = item.thumbnail
             scrapedtitle = unicode(scrapedtitle, encoding="utf-8", errors="ignore")
             scrapedtitle = scrapertools.htmlclean(scrapedtitle)
@@ -432,7 +431,7 @@ def search_links_filmaff(item):
 
 
 def jayhap_search(item):
-    logger.info("streamondemand.channels.trailertools jayhap_search")
+    logger.info()
     itemlist = []
 
     if item.extra != "jayhap":
@@ -573,6 +572,6 @@ try:
                         buscartrailer(item)
             except:
                 import traceback
-                logger.info(traceback.format_exc())
+                logger.error(traceback.format_exc())
 except:
     pass

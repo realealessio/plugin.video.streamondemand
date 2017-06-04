@@ -25,7 +25,8 @@
 # Parámetros de configuración (kodi)
 # ------------------------------------------------------------
 
-import os, re
+import os
+import re
 
 import xbmc
 import xbmcaddon
@@ -97,11 +98,75 @@ def get_system_platform():
     return platform
 
 
+def get_all_settings_addon():
+    # Lee el archivo settings.xml y retorna un diccionario con {id: value}
+    import scrapertools
+
+    infile = open(os.path.join(get_data_path(),"settings.xml"), "r")
+    data = infile.read()
+    infile.close()
+
+    ret = {}
+    matches = scrapertools.find_multiple_matches(data, '<setting id="([^"]*)" value="([^"]*)')
+    for id, value in matches:
+        ret[id] = value
+
+    return ret
+
+
 def open_settings():
+    settings_pre = get_all_settings_addon()
     __settings__.openSettings()
+    settings_post = get_all_settings_addon()
+
+    # cb_validate_config (util para validar cambios realizados en el cuadro de dialogo)
+    if settings_post.get('adult_aux_intro_password', None):
+        # Hemos accedido a la seccion de Canales para adultos
+        from platformcode import platformtools
+        if not 'adult_password' in settings_pre:
+            adult_password = set_setting('adult_password', '1111')
+        else:
+            adult_password = settings_pre['adult_password']
+
+        if settings_post['adult_aux_intro_password'] == adult_password:
+            # La contraseña de acceso es correcta
+
+            # Cambio de contraseña
+            if settings_post['adult_aux_new_password1']:
+                if settings_post['adult_aux_new_password1'] == settings_post['adult_aux_new_password2']:
+                    adult_password = set_setting('adult_password', settings_post['adult_aux_new_password1'])
+                else:
+                    platformtools.dialog_ok("Canales para adultos", "Los campos 'Nueva contraseña' y 'Confirmar nueva contraseña' no coinciden.",
+                                            "Entre de nuevo en 'Preferencias' para cambiar la contraseña")
+
+            # Fijar adult_pin
+            adult_pin = ""
+            if settings_post["adult_request_password"] == "true":
+                adult_pin = adult_password
+            set_setting("adult_pin", adult_pin)
+
+        else:
+            platformtools.dialog_ok("Canales para adultos", "La contraseña no es correcta.",
+                                    "Los cambios realizados en esta sección no se guardaran.")
+            # Deshacer cambios
+            set_setting("adult_mode", settings_pre.get("adult_mode","0"))
+            set_setting("adult_request_password", settings_pre.get("adult_request_password", "true"))
 
 
-def get_setting(name, channel=""):
+        # Borramos settings auxiliares
+        set_setting('adult_aux_intro_password', '')
+        set_setting('adult_aux_new_password1', '')
+        set_setting('adult_aux_new_password2', '')
+                
+            
+                    
+
+
+
+
+
+
+def get_setting(name, channel="", server=""):
     """
     Retorna el valor de configuracion del parametro solicitado.
 
@@ -129,29 +194,40 @@ def get_setting(name, channel=""):
         value = channeltools.get_channel_setting(name, channel)
         # logger.info("config.get_setting -> '"+repr(value)+"'")
 
-        if value is not None:
-            return value
-        else:
-            return ""
+        return value
+
+    elif server:
+        # logger.info("config.get_setting reading server setting '"+name+"' from server xml")
+        from core import servertools
+        value = servertools.get_server_setting(name, server)
+        # logger.info("config.get_setting -> '"+repr(value)+"'")
+
+        return value
 
     # Global setting
     else:
         # logger.info("config.get_setting reading main setting '"+name+"'")
-        value = __settings__.getSetting(channel + name)
+        value = __settings__.getSetting(name)
         # Translate Path if start with "special://"
         if value.startswith("special://") and "librarypath" not in name:
             value = xbmc.translatePath(value)
 
         # logger.info("config.get_setting -> '"+value+"'")
-        # hack para devolver bool en el caso de que lo sea
+        # hack para devolver el tipo correspondiente
         if value == "true":
             return True
         elif value == "false":
             return False
         else:
+            try:
+                value = int(value)
+            except ValueError:
+                pass
+
             return value
 
-def set_setting(name, value, channel=""):
+
+def set_setting(name, value, channel="", server=""):
     """
     Fija el valor de configuracion del parametro indicado.
 
@@ -177,8 +253,19 @@ def set_setting(name, value, channel=""):
     if channel:
         from core import channeltools
         return channeltools.set_channel_setting(name, value, channel)
+    elif server:
+        from core import servertools
+        return servertools.set_server_setting(name, value, server)
     else:
         try:
+            if isinstance(value, bool):
+                if value:
+                    value = "true"
+                else:
+                    value = "false"
+            elif isinstance(value, (int, long)):
+                value = str(value)
+
             __settings__.setSetting(name, value)
         except:
             return None
@@ -238,7 +325,6 @@ def get_cookie_data():
     return cookiedata
 
 
-
 # Test if all the required directories are created
 def verify_directories_created():
     from core import logger
@@ -267,6 +353,7 @@ def verify_directories_created():
 
 
         if get_setting("library_set_content")== True and path in ["librarypath","downloadpath"]:
+            # logger.debug("library_set_content %s" % get_setting("library_set_content"))
             xbmc_library.add_sources(saved_path)
 
         saved_path = xbmc.translatePath(saved_path)
@@ -293,3 +380,37 @@ def verify_directories_created():
 
         elif get_setting("library_ask_set_content") == "active":
             xbmc_library.set_content(default)
+
+    try:
+        from core import scrapertools
+        # Buscamos el archivo addon.xml del skin activo
+        skindir = filetools.join(xbmc.translatePath("special://home"), 'addons', xbmc.getSkinDir(),
+                                 'addon.xml')
+        # Extraemos el nombre de la carpeta de resolución por defecto
+        folder = ""
+        data = filetools.read(skindir)
+        res = scrapertools.find_multiple_matches(data, '(<res .*?>)')
+        for r in res:
+            if 'default="true"' in r:
+                folder = scrapertools.find_single_match(r, 'folder="([^"]+)"')
+                break
+
+        # Comprobamos si existe en pelisalacarta y sino es así, la creamos
+        default = filetools.join(get_runtime_path(), 'resources', 'skins', 'Default')
+        if folder and not filetools.exists(filetools.join(default, folder)):
+            filetools.mkdir(filetools.join(default, folder))
+
+        # Copiamos el archivo a dicha carpeta desde la de 720p si éste no existe o si el tamaño es diferente
+        if folder and folder != '720p':
+            for root, folders, files in filetools.walk(filetools.join(default, '720p')):
+                for f in files:
+                    if not filetools.exists(filetools.join(default, folder, f)) or \
+                          (filetools.getsize(filetools.join(default, folder, f)) != 
+                           filetools.getsize(filetools.join(default, '720p', f))):
+                        filetools.copy(filetools.join(default, '720p', f),
+                                       filetools.join(default, folder, f),
+                                       True)
+    except:
+        import traceback
+        logger.error("Al comprobar o crear la carpeta de resolución")
+        logger.error(traceback.format_exc())

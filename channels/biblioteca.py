@@ -94,6 +94,7 @@ def channel_config(item):
     return platformtools.show_channel_settings(channelpath=os.path.join(config.get_runtime_path(),
                                                                         "channels", item.channel))
 
+
 def peliculas(item):
     logger.info()
     itemlist = []
@@ -133,7 +134,6 @@ def peliculas(item):
                 else:
                     texto_eliminar = "Elimina questo film"
                     multicanal = False
-
 
                 new_item.context = [{"title": texto_visto,
                                      "action": "mark_content_as_watched",
@@ -186,7 +186,6 @@ def series(item):
                     texto_update = "Trova automaticamente nuovi episodi: Attiva"
                     value = 1
                     item_tvshow.text_color = "0xFFDF7401"
-
 
                 # Menu contextual: Eliminar serie/canal
                 num_canales = len(item_tvshow.library_urls)
@@ -321,7 +320,6 @@ def get_episodios(item):
             epi.contentTitle = "%sx%s" % (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2))
             epi.title = "%sx%s - %s" % (epi.contentSeason, str(epi.contentEpisodeNumber).zfill(2), title_episodie)
 
-
             if item_nfo.library_filter_show:
                 epi.library_filter_show = item_nfo.library_filter_show
 
@@ -368,7 +366,6 @@ def findvideos(item):
         item.strm_path = filetools.join(library.TVSHOWS_PATH, item.strm_path)
         path_dir = os.path.dirname(item.strm_path)
         item.nfo = filetools.join(path_dir, 'tvshow.nfo')
-
 
     for fd in filetools.listdir(path_dir):
         if fd.endswith('.json'):
@@ -432,7 +429,7 @@ def findvideos(item):
         try:
             # FILTERTOOLS
             # si el canal tiene filtro se le pasa el nombre que tiene guardado para que filtre correctamente.
-            if "list_idiomas" in item_json:
+            if "list_language" in item_json:
                 # si se viene desde la biblioteca de pelisalacarta
                 if "library_filter_show" in item:
                     item_json.show = item.library_filter_show.get(nom_canal, "")
@@ -440,6 +437,7 @@ def findvideos(item):
             # Ejecutamos find_videos, del canal o común
             if hasattr(channel, 'findvideos'):
                 list_servers = getattr(channel, 'findvideos')(item_json)
+                list_servers = servertools.filter_servers(list_servers)
             else:
                 from core import servertools
                 list_servers = servertools.find_video_items(item_json)
@@ -511,12 +509,12 @@ def play(item):
 
     return itemlist
 
+
 def update_biblio(item):
     logger.info()
 
     # Actualizar las series activas sobreescribiendo
     import library_service
-
     library_service.check_for_update(overwrite=True)
 
     # Eliminar las carpetas de peliculas que no contengan archivo strm
@@ -548,6 +546,7 @@ def update_serie(item):
 
     p_dialog.close()
 
+
 def mark_content_as_watched(item):
     logger.info()
     # logger.debug("item:\n" + item.tostring('\n'))
@@ -561,7 +560,7 @@ def mark_content_as_watched(item):
             name_file = "%sx%s" % (item.contentSeason, str(item.contentEpisodeNumber).zfill(2))
         else:
             name_file = item.contentTitle
-        
+
         if not hasattr(it, 'library_playcounts'):
             it.library_playcounts = {}
         it.library_playcounts.update({name_file: item.playcount})
@@ -652,6 +651,7 @@ def eliminar(item):
 
     def eliminar_todo(_item):
         filetools.rmdirtree(_item.path)
+
         if config.is_xbmc():
             import xbmc
             # esperamos 3 segundos para dar tiempo a borrar los ficheros
@@ -663,7 +663,6 @@ def eliminar(item):
 
         logger.info("Eliminados todos los enlaces")
         platformtools.itemlist_refresh()
-
 
     # logger.info(item.contentTitle)
     # logger.debug(item.tostring('\n'))

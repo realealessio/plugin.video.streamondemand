@@ -30,6 +30,7 @@ import os
 
 import xbmcgui
 from core import channeltools
+from core import servertools
 from core import config
 from core import logger
 
@@ -165,7 +166,7 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
     """
     def start(self, list_controls=None, dict_values=None, title="Opzioni", callback=None, item=None,
               custom_button=None, channelpath=None):
-        logger.info("[xbmc_config_menu] start")
+        logger.info()
 
         # Ruta para las imagenes de la ventana
         self.mediapath = os.path.join(config.get_runtime_path(), 'resources', 'skins', 'Default', 'media')
@@ -199,7 +200,15 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
 
                 # La llamada se hace desde un canal
                 self.list_controls, default_values = channeltools.get_channel_controls_settings(self.channel)
+                self.kwargs = {"channel": self.channel}
+                
+            # Si la ruta del canal esta en la carpeta "servers", obtenemos los controles y valores mediante servertools
+            elif os.path.join(config.get_runtime_path(), "servers") in channelpath:
 
+                # La llamada se hace desde un canal
+                self.list_controls, default_values = servertools.get_server_controls_settings(self.channel)
+                self.kwargs = {"server": self.channel}
+                
             # En caso contrario salimos
             else:
                 return None
@@ -564,9 +573,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
 
             # Decidimos si usar el valor por defecto o el valor guardado
             if c["type"] in ["bool", "text", "list"]:
-                if id not in self.values:
+                if c["id"] not in self.values:
                     if not self.callback:
-                        self.values[c["id"]] = config.get_setting(c["id"], self.channel)
+                        self.values[c["id"]] = config.get_setting(c["id"], **self.kwargs)
                     else:
                         self.values[c["id"]] = c["default"]
 
@@ -729,9 +738,9 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
 
         # Boton Aceptar
         if id == 10004:
-            if not self.callback:
+            '''if not self.callback:
                 for v in self.values:
-                    config.set_setting(v, self.values[v], self.channel)
+                    config.set_setting(v, self.values[v], **self.kwargs)
                 self.close()
             else:
                 self.close()
@@ -745,7 +754,32 @@ class SettingsWindow(xbmcgui.WindowXMLDialog):
                 except ImportError:
                     logger.error('Imposible importar %s' % package)
 
+                self.return_value = getattr(cb_channel, self.callback)(self.item, self.values)'''
+            self.close()
+            if self.callback and '.' in self.callback:
+                package, self.callback = self.callback.rsplit('.', 1)
+            else:
+                package = 'channels.%s' % self.channel
+
+            cb_channel = None
+            try:
+                cb_channel = __import__(package, None, None, [package])
+            except ImportError:
+                logger.error('Imposible importar %s' % package)
+
+            if self.callback:
+                # Si existe una funcion callback la invocamos ...
                 self.return_value = getattr(cb_channel, self.callback)(self.item, self.values)
+            else:
+                # si no, probamos si en el canal existe una funcion 'cb_validate_config' ...
+                try:
+                    self.return_value = getattr(cb_channel, 'cb_validate_config')(self.item, self.values)
+                except AttributeError:
+                    # ... si tampoco existe 'cb_validate_config'...
+                    for v in self.values:
+                        config.set_setting(v, self.values[v], self.channel)
+
+
 
         # Controles de ajustes, si se cambia el valor de un ajuste, cambiamos el valor guardado en el diccionario de
         # valores

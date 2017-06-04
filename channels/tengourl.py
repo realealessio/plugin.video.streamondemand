@@ -5,18 +5,14 @@
 # http://www.mimediacenter.info/foro/viewforum.php?f=36
 #------------------------------------------------------------
 
-from core import config
 from core import logger
 from core import scrapertools
 from core import servertools
 from core.item import Item
 
 
-DEBUG = config.get_setting("debug")
-
-
 def mainlist(item):
-    logger.info("[tengourl.py] mainlist")
+    logger.info()
 
     itemlist = []
     itemlist.append( Item(channel=item.channel, action="search", title="Inserire l'URL [Link a server / download]"))
@@ -27,7 +23,7 @@ def mainlist(item):
 
 # Al llamarse "search" la función, el launcher pide un texto a buscar y lo añade como parámetro
 def search(item,texto):
-    logger.info("[tengourl.py] search texto="+texto)
+    logger.info("texto="+texto)
 
     if not texto.startswith("http://"):
         texto = "http://"+texto

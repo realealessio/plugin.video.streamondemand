@@ -308,7 +308,7 @@ def save_library_tvshow(item, episodelist):
 
     # FILTERTOOLS
     # si el canal tiene filtro de idiomas, añadimos el canal y el show
-    if episodelist and "list_idiomas" in episodelist[0]:
+    if episodelist and "list_language" in episodelist[0]:
         # si ya hemos añadido un canal previamente con filtro, añadimos o actualizamos el canal y show
         if "library_filter_show" in item_tvshow:
             item_tvshow.library_filter_show[item.channel] = item.show
@@ -423,7 +423,7 @@ def save_library_episodes(path, episodelist, serie, silent=False, overwrite=True
             item_strm.contentTitle = season_episode
 
             # FILTERTOOLS
-            if item_strm.list_idiomas:
+            if item_strm.list_language:
                 # si tvshow.nfo tiene filtro se le pasa al item_strm que se va a generar
                 if "library_filter_show" in serie:
                     item_strm.library_filter_show = serie.library_filter_show
@@ -574,6 +574,7 @@ def add_serie_to_library(item, channel=None):
 
     """
     logger.info("show=#" + item.show + "#")
+
     if config.is_xbmc():
         from platformcode import xbmc_library
         xbmc_library.ask_set_content()
@@ -601,8 +602,6 @@ def add_serie_to_library(item, channel=None):
 
         # Obtiene el listado de episodios
         itemlist = getattr(channel, item.action)(item)
-
-
 
     insertados, sobreescritos, fallidos, path = save_library_tvshow(item, itemlist)
 
@@ -635,5 +634,4 @@ def add_serie_to_library(item, channel=None):
                 # Se lanza la sincronizacion para la biblioteca de Kodi
                 xbmc_library.sync_trakt_kodi()
                 # Se lanza la sincronización para la biblioteca de pelisalacarta
-                xbmc_library.sync_trakt_streamondemand(path)
-
+                xbmc_library.sync_trakt_pelisalacarta(path)

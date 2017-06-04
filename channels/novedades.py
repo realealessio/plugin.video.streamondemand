@@ -55,7 +55,7 @@ list_newest =[]
 channels_ID_name = {}
 
 def mainlist(item,thumbnail_type="squares"):
-    logger.info("streamondemand.channels.novedades mainlist")
+    logger.info()
 
     itemlist = []
     list_canales = get_list_canales()
@@ -128,7 +128,7 @@ def mainlist(item,thumbnail_type="squares"):
 
 
 def get_list_canales():
-    logger.info("streamondemand.channels.novedades get_list_canales")
+    logger.info()
 
     list_canales = {'peliculas': [], 'infantiles': [], 'series': [], 'anime': [], 'documentales': []}
 
@@ -147,9 +147,11 @@ def get_list_canales():
         # No incluir si es un canal inactivo
         if channel_parameters["active"] != True:
             continue
+
         # No incluir si es un canal para adultos, y el modo adulto está desactivado
-        if channel_parameters["adult"] == True and config.get_setting("adult_mode") == False:
+        if channel_parameters["adult"] == True and config.get_setting("adult_mode") == 0:
             continue
+
         # No incluir si el canal es en un idioma filtrado
         if channel_language != "all" and channel_parameters["language"] != channel_language:
             continue
@@ -165,7 +167,7 @@ def get_list_canales():
 
 
 def novedades(item):
-    logger.info("streamondemand.channels.novedades item="+item.tostring())
+    logger.info()
 
     global list_newest
     l_hilo = []
@@ -173,7 +175,7 @@ def novedades(item):
     start_time = time.time()
 
     multithread = config.get_setting("multithread", "novedades")
-    logger.info("streamondemand.channels.novedades multithread="+str(multithread)) 
+    logger.info("multithread= "+str(multithread))
 
     if not multithread:
         if platformtools.dialog_yesno("Multi-thread disattivato",
@@ -248,7 +250,7 @@ def novedades(item):
 
 
 def get_newest(channel_id, categoria):
-    logger.info("streamondemand.channels.novedades get_newest channel_id="+channel_id+", categoria="+categoria)
+    logger.info("channel_id="+channel_id+", categoria="+categoria)
 
     global list_newest
 
@@ -268,9 +270,9 @@ def get_newest(channel_id, categoria):
         if not puede:
             return
 
-        logger.info("streamondemand.channels.novedades running channel "+modulo.__name__+" "+modulo.__file__)
+        logger.info("running channel "+modulo.__name__+" "+modulo.__file__)
         list_result = modulo.newest(categoria)
-        logger.info("streamondemand.channels.novedades.get_newest canal= %s %d resultados" %(channel_id, len(list_result)))
+        logger.info("canal= %s %d resultados" %(channel_id, len(list_result)))
 
         for item in list_result:
             #logger.info("streamondemand.channels.novedades.get_newest   item="+item.tostring())
@@ -404,7 +406,7 @@ def agruparXcontenido(list_result_canal, categoria):
 
 
 def ver_canales(item):
-    logger.info("streamondemand.channels.novedades ver_canales")
+    logger.info()
     channels_ID_name = item.extra
     itemlist = []
 
@@ -476,7 +478,7 @@ def settingCanal(item):
             continue
 
         # No incluir si es un canal para adultos, y el modo adulto está desactivado
-        if channel_parameters["adult"] == True and config.get_setting("adult_mode") == False:
+        if channel_parameters["adult"] == True and config.get_setting("adult_mode") == 0:
             continue
 
         # No incluir si el canal es en un idioma filtrado
