@@ -11,9 +11,9 @@
     <bannermenu>http://www.wrestlingrevolution.it/images/new/slideshow/occhiodelwrestling.jpg</bannermenu>
 
     <update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-    <version>1</version>
-    <date>20/04/2017</date>
-    <changes>new channel</changes>
+    <version>2</version>
+    <date>06/06/2017</date>
+    <changes>Small Fix</changes>
 
 	<categories>
 		<category>documentary</category>

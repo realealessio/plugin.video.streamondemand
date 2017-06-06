@@ -77,11 +77,13 @@ def loaditems(item):
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
 
-    patron = r'<img.*?src="([^"]+)".*?/>\s*<a href="([^"]+)" title="([^"]+)".*?>'
+    patron = r'<img[^s]+src="([^"]+)"[^>]+>\s*<a href="([^"]+)" title="([^"]+)"[^>]+>'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for scrapedimg, scrapedurl, scrapedtitle in matches:
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+        if "streaming" in scrapedtitle.lower():
+            continue
         itemlist.append(
             Item(channel=__channel__,
                  action="findvideos",
@@ -101,19 +103,23 @@ def findvideos(item):
     itemlist = []
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
-    patron = r'<a href="(http://adf.ly/[^"]+)"(?: target="_blank"|)>(.*?)</a>'
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    #patron = r'<a href="(http://(?:riffhold.com|atominik.com|adf.ly)/[^"]+)"(?: target="_blank"|)>(.*?)</a>'
+    blocchi = re.compile(r'(?:<p>.*?</p>|<div class="entry-content">)\s*<ul>(.*?)</ul>', re.DOTALL).findall(data)
 
     index = 1
-    for scrapedurl, scrapedtitle in matches:
-        itemlist.append(
-            Item(channel=__channel__,
-                 action="play",
-                 title="Link %s: %s" % (index, scrapedtitle),
-                 fulltitle=scrapedtitle,
-                 url=scrapedurl,
-                 thumbnail=item.thumbnail))
-        index += 1
+    for blocco in blocchi:
+        patron = r'<li[^>]*><a href="([^"]+)"[^>]*>(.*?)</a></li>'
+        matches = re.compile(patron, re.DOTALL).findall(blocco)
+
+        for scrapedurl, scrapedtitle in matches:
+            itemlist.append(
+                Item(channel=__channel__,
+                    action="play",
+                    title="%s: %s" % (color("Link %s" % index, "red"), color(scrapedtitle, "azure")),
+                    fulltitle=scrapedtitle,
+                    url=scrapedurl,
+                    thumbnail=item.thumbnail))
+            index += 1
     return itemlist
 
 # ================================================================================================================
