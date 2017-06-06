@@ -167,6 +167,9 @@ def ultimiep(item):
     matches = re.compile(patron, re.DOTALL).findall(bloque)
 
     for scrapedurl, scrapedtitle in matches:
+        if 'anime' in item.extra:
+            ep = scrapertools.find_single_match(scrapedtitle, r'\d+$').zfill(2)
+            scrapedtitle = re.sub(r'\d+$', ep, scrapedtitle)
         scrapedurl = host + scrapedurl
         scrapedplot = ""
         scrapedthumbnail = ""
@@ -175,7 +178,7 @@ def ultimiep(item):
         itemlist.append(infoSod(
             Item(channel=__channel__,
                  action="findvideos",
-                 fulltitle=(re.sub(r'\d+$', '', scrapedtitle) if 'anime' in item.extra else re.sub(r'\d+x\d+$', '', scrapedtitle)).strip(),
+                 fulltitle=(re.sub(r'\d*-?\d+$', '', scrapedtitle) if 'anime' in item.extra else re.sub(r'\d+x\d+$', '', scrapedtitle)).strip(),
                  show=scrapedtitle,
                  title=scrapedtitle,
                  url=scrapedurl,
