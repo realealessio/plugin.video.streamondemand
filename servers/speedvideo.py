@@ -26,7 +26,7 @@ def get_video_url( page_url , premium = False , user="" , password="", video_pas
     data = scrapertools.cachePage(page_url)
 
     codif = scrapertools.find_single_match(data,'var [a-z]+ = ([0-9]+);')
-    link = scrapertools.find_single_match(data,'linkfile =\s*"([^"]+)"')
+    link = scrapertools.find_single_match(data,'linkfile[^=]+="([^"]+)"')
     numero = int(codif)
 
     #Decrypt link base64 // python version of speedvideo's base64_decode() [javascript] 
