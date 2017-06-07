@@ -63,7 +63,6 @@ def serietv(item):
         scrapedplot = ""
         scrapedthumbnail = ""
         scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
-        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
         if (DEBUG): logger.info(
             "title=[" + scrapedtitle + "], url=[" + scrapedurl + "], thumbnail=[" + scrapedthumbnail + "]")
         itemlist.append(
