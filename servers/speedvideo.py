@@ -26,7 +26,7 @@ def get_video_url( page_url , premium = False , user="" , password="", video_pas
     data = scrapertools.cachePage(page_url)
 
     codif = scrapertools.find_single_match(data,'var [a-z]+ = ([0-9]+);')
-    link = scrapertools.find_single_match(data,'linkfile ="([^"]+)"')
+    link = scrapertools.find_single_match(data,'linkfile =\s*"([^"]+)"')
     numero = int(codif)
 
     #Decrypt link base64 // python version of speedvideo's base64_decode() [javascript] 
@@ -40,7 +40,7 @@ def get_video_url( page_url , premium = False , user="" , password="", video_pas
     
     return video_urls
 
-# Encuentra vídeos de este servidor en el texto pasado
+# Encuentra videos de este servidor en el texto pasado
 def find_videos(text):
     encontrados = set()
     devuelve = []
@@ -102,4 +102,5 @@ def find_videos(text):
 					
     
     return devuelve
+
 
