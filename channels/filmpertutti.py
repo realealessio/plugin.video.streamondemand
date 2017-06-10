@@ -122,7 +122,7 @@ def peliculas(item):
                  folder=True), tipo='movie'))
 
     # Extrae el paginador
-    patronvideos = '<a href="(.*?)" >Pagina successiva'
+    patronvideos = '<a href="([^"]+)"[^>]+>Pagina'
     matches = re.compile(patronvideos, re.DOTALL).findall(data)
 
     if len(matches) > 0:
@@ -173,7 +173,7 @@ def peliculas_tv(item):
                  folder=True), tipo='tv'))
 
     # Extrae el paginador
-    patronvideos = '<a href="(.*?)" >Pagina successiva'
+    patronvideos = '<a href="([^"]+)"[^>]+>Pagina'
     matches = re.compile(patronvideos, re.DOTALL).findall(data)
 
     if len(matches) > 0:
