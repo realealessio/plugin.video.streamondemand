@@ -179,8 +179,6 @@ def ultimiep(item):
 
     data = scrapertools.cache_page(item.url, headers=headers)
 
-    blocco = scrapertools.get_match(data, r'<div class="main-loop-inner">(.*?)<br class="clearer"/>\s*</div>')
-
     patron = r'<img.*?src="([^"]+)"[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+><a href="([^"]+)">([^<]+)</a>'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
