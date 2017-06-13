@@ -11,9 +11,9 @@
     <bannermenu>http://www.animesenzalimiti.com/wp-content/uploads/2016/10/cropped-bg0-2.jpg</bannermenu>
 
     <update_url>https://raw.githubusercontent.com/streamondemand/plugin.video.streamondemand/master/channels/</update_url>
-    <version>4</version>
-    <date>16/05/2017</date>
-    <changes>Small Fix</changes>
+    <version>5</version>
+    <date>12/06/2017</date>
+    <changes>Added newest</changes>
 
     <categories>
         <category>anime</category>
@@ -25,6 +25,15 @@
 		<label>Includi ricerca globale</label>
 		<default>false</default>
 		<enabled>false</enabled>
+		<visible>true</visible>
+	</settings>
+
+	<settings>
+		<id>include_in_newest_anime</id>
+		<type>bool</type>
+		<label>Includi in novità - Anime</label>
+		<default>true</default>
+		<enabled>true</enabled>
 		<visible>true</visible>
 	</settings>
 </channel>
