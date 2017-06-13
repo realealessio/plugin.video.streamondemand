@@ -41,8 +41,8 @@ def mainlist(item):
                      url=host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
-                     action="lista_anime",
-                     title=color("Ultimi Anime", "azure"),
+                     action="ultimiep",
+                     title=color("Ultimi Episodi", "azure"),
                      url=host,
                      thumbnail="http://orig03.deviantart.net/6889/f/2014/079/7/b/movies_and_popcorn_folder_icon_by_matheusgrilo-d7ay4tw.png"),
                 Item(channel=__channel__,
@@ -70,6 +70,30 @@ def mainlist(item):
                      title=color("Cerca anime ...", "yellow"),
                      thumbnail="http://dc467.4shared.com/img/fEbJqOum/s7/13feaf0c8c0/Search")
                 ]
+
+    return itemlist
+
+# ================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------
+def newest(categoria):
+    logger.info("[AnimeSenzaLimiti.py]==> newest " + categoria)
+    itemlist = []
+    item = Item()
+    try:
+        if categoria == "anime":
+            item.url = "http://www.animesenzalimiti.com"
+            item.action = "ultimiep"
+            itemlist = ultimiep(item)
+
+            if itemlist[-1].action == "ultimiep":
+                itemlist.pop()
+    # Se captura la excepción, para no interrumpir al canal novedades si un canal falla
+    except:
+        import sys
+        for line in sys.exc_info():
+            logger.error("{0}".format(line))
+        return []
 
     return itemlist
 
@@ -145,12 +169,53 @@ def animepopolari(item):
 # ================================================================================================================
 
 # ----------------------------------------------------------------------------------------------------------------
+def ultimiep(item):
+    logger.info("[AnimeSenzaLimiti.py]==> ultimiep")
+    itemlist = []
+
+    data = scrapertools.anti_cloudflare(item.url, headers=headers)
+
+    blocco = scrapertools.get_match(data, r'<div class="mh-wrapper clearfix">(.*?)<div class="mh-loop-pagination clearfix">')
+
+    patron = r'<a href="([^"]+)"><img.*?src="([^?]+)[^"]+"[^>]+>'
+    patron += r'[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</a>'
+    matches = re.compile(patron, re.DOTALL).findall(blocco)
+
+    for scrapedurl, scrapedthumbnail, scrapedtitle in matches:
+        scrapedtitle = scrapertools.decodeHtmlentities(scrapedtitle)
+        # Pulizia titolo
+        scrapedtitle = removestreaming(scrapedtitle).strip()
+        cleantitle = re.sub(r'Episodio?\s*\d+\s*(?:\(\d+\)|)', '', scrapedtitle).strip()
+        ep = scrapertools.find_single_match(scrapedtitle, r'\d+$').zfill(2)
+        scrapedtitle = re.sub(r'\d+$', ep, scrapedtitle)
+        # Creazione URL
+        ep = scrapertools.find_single_match(scrapedtitle.lower(), r'episodio?\s*(\d+)')
+        scrapedurl = re.sub(r'episodio?-?\d+-?(?:\d+-|)[oav]*', '', scrapedurl)
+
+        if 'sub-ita' in scrapedurl:
+            scrapedurl = re.sub(r'/$', '', scrapedurl).replace('-sub-ita', '') + "-sub-ita/"
+
+        print "EPISODIO: " + ep + "\nTITLE: " + scrapedtitle + "\nURL: " + scrapedurl
+        itemlist.append(infoSod(
+            Item(channel=__channel__,
+                 action="findvideos",
+                 title=scrapedtitle,
+                 url=scrapedurl + ep,
+                 fulltitle=cleantitle,
+                 show=re.sub(r'Episodio\s*', '', scrapedtitle),
+                 thumbnail=scrapedthumbnail), tipo="tv"))
+
+    return itemlist
+
+# ================================================================================================================
+
+# ----------------------------------------------------------------------------------------------------------------
 def lista_anime(item):
     logger.info("[AnimeSenzaLimiti.py]==> lista_anime")
     itemlist = []
 
     data = scrapertools.anti_cloudflare(item.url, headers=headers)
-    patron = r'<a href="([^"]+)"><img.*?src="([^?]+)[^"]+".*?/>'
+    patron = r'<a href="([^"]+)"><img.*?src="([^?]+)[^"]+"[^>]+>'
     patron += r'[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>[^>]+>([^<]+)</a>'
     matches = re.compile(patron, re.DOTALL).findall(data)
 
@@ -248,7 +313,7 @@ def findvideos(item):
 
 # ----------------------------------------------------------------------------------------------------------------
 def removestreaming(text):
-    return re.sub("Streaming e Download (?:SUB ITA|ITA)", "", text)
+    return re.sub("(?:SUB ITA|ITA|)\s*(?:Download|Streaming)\s*(?:e|&)\s*(?:Download|Streaming)\s*(?:SUB ITA|ITA|)", "", text)
 
 def color(text, color):
     return "[COLOR "+color+"]"+text+"[/COLOR]"
