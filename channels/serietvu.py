@@ -181,7 +181,7 @@ def lista_serie(item):
                  folder=True), tipo="tv"))
 
     # Pagine
-    patron = r'<li><a href="([^"]+)"\s*>Pagina'
+    patron = '<a href="([^"]+)"[^>]+>Pagina'
     next_page = scrapertools.find_single_match(data, patron)
     if len(matches) > 0:
         itemlist.append(
