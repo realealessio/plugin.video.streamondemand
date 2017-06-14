@@ -95,6 +95,8 @@ def get_servers_itemlist(itemlist, fnc=None, sort=False):
     @type itemlist: list
     @param fnc: función para ejecutar con cada item (para asignar el titulo)
     @type fnc: function
+    @param sort: indica si el listado resultante se ha de ordenar en funcion de la lista de servidores favoritos
+    @type sort: bool
     """
     server_stats = {}
     #Recorre los servidores
@@ -144,6 +146,7 @@ def get_servers_itemlist(itemlist, fnc=None, sort=False):
     
     return itemlist
 
+
 def findvideos(data, skip=False):
     """
     Recorre la lista de servidores disponibles y ejecuta la funcion findvideosbyserver para cada uno de ellos
@@ -185,6 +188,9 @@ def findvideos(data, skip=False):
 
 def findvideosbyserver(data, serverid):
     serverid = get_server_name(serverid)
+    if not serverid:
+        return []
+        
     server_parameters = get_server_parameters(serverid)
     devuelve = []
     
@@ -264,6 +270,7 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
     video_urls = []
     video_exists = True
     error_messages = []
+    opciones = []
     
     # Si el vídeo es "directo" o "local", no hay que buscar más
     if server=="directo" or server=="local":
@@ -272,20 +279,24 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
 
     # Averigua la URL del vídeo
     else:
-        server_parameters = get_server_parameters(server)
-        
-        # Muestra un diágo de progreso
-        if muestra_dialogo:
-            progreso = platformtools.dialog_progress("pelisalacarta", "Conectando con %s" % server_parameters["name"])
+        if server:
+            server_parameters = get_server_parameters(server)
+        else:
+            server_parameters = {}
 
-        #Cuenta las opciones disponibles, para calcular el porcentaje
-        opciones = []
-        orden = [["free"] + [server] + [premium for premium in server_parameters["premium"] if not premium == server],
-                 [server] + [premium for premium in server_parameters["premium"] if not premium == server] + ["free"],
-                 [premium for premium in server_parameters["premium"] if not premium == server] + [server] + ["free"]
-                ]
-        
         if server_parameters:
+            # Muestra un diágo de progreso
+            if muestra_dialogo:
+                progreso = platformtools.dialog_progress("pelisalacarta", "Conectando con %s" % server_parameters["name"])
+
+            #Cuenta las opciones disponibles, para calcular el porcentaje
+            
+            orden = [["free"] + [server] + [premium for premium in server_parameters["premium"] if not premium == server],
+                     [server] + [premium for premium in server_parameters["premium"] if not premium == server] + ["free"],
+                     [premium for premium in server_parameters["premium"] if not premium == server] + [server] + ["free"]
+                    ]
+        
+        
             if server_parameters["free"] == "true": opciones.append("free")
             opciones.extend([premium for premium in server_parameters["premium"] if config.get_setting("premium",server=premium)])
             
@@ -297,6 +308,7 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
         else:
             logger.error("No existe conector para el servidor %s" % server)
             error_messages.append("No existe conector para el servidor %s" % server)
+            muestra_dialogo = False
 
         #Importa el server
         try:
@@ -473,7 +485,9 @@ def get_server_parameters(server):
     """
     global dict_servers_parameters
     server = server.split('.')[0]
-    
+    if not server:
+        return {}
+        
     if not server in dict_servers_parameters:
         try:
             #Servers
@@ -522,26 +536,41 @@ def get_server_parameters(server):
             logger.error(mensaje + traceback.format_exc())
             return {}
     
-    import copy
-    return copy.deepcopy(dict_servers_parameters[server])
+    return dict_servers_parameters[server]
 
 
 def get_server_controls_settings(server_name):
     dict_settings = {}
 
     list_controls = get_server_parameters(server_name).get('settings',[])
-
+    import copy
+    list_controls = copy.deepcopy(list_controls)
+    
     # Conversion de str a bool, etc...
     for c in list_controls:
         if 'id' not in c or 'type' not in c or 'default' not in c:
             # Si algun control de la lista  no tiene id, type o default lo ignoramos
             continue
-        
-        c['enabled'] = [True, False][c.get('enabled', '').lower() == "false"]
-        c['visible'] = [True, False][c.get('visible', '').lower() == "false"]
-        
+
+        if 'enabled' not in c or c['enabled'] is None:
+            c['enabled'] = True
+        else:
+            if c['enabled'].lower() == "true":
+                c['enabled'] = True
+            elif c['enabled'].lower() == "false":
+                c['enabled'] = False
+
+        if 'visible' not in c or c['visible'] is None:
+            c['visible'] = True
+
+        else:
+            if c['visible'].lower() == "true":
+                c['visible'] = True
+            elif c['visible'].lower() == "false":
+                c['visible'] = False
+
         if c['type'] == 'bool':
-            c['default'] = [True, False][c.get('default', '').lower() == "false"]
+            c['default'] = (c['default'].lower() == "true")
 
         if unicode(c['default']).isnumeric():
             c['default'] = int(c['default'])
@@ -668,40 +697,42 @@ def get_debriders_list():
 
 def sort_servers(servers_list):
     """
-    Si existe un listado de servidores favoritos en la configuracion lo utiliza para ordenar la lista servers_list
+    Si esta activada la opcion "Ordenar servidores" en la configuracion de servidores y existe un listado de servidores 
+    favoritos en la configuracion lo utiliza para ordenar la lista servers_list
     :param servers_list: Listado de servidores para ordenar. Los elementos de la lista servers_list pueden ser strings
     u objetos Item. En cuyo caso es necesario q tengan un atributo item.server del tipo str.
     :return: Lista del mismo tipo de objetos que servers_list ordenada en funcion de los servidores favoritos.
     """
-    if servers_list:
+    if servers_list and config.get_setting('favorites_servers'):
         if isinstance(servers_list[0],Item):
-            servers_list = sorted(servers_list, key = lambda x: config.get_setting("white_list",server=x.server) or 100)
+            servers_list = sorted(servers_list, key = lambda x: config.get_setting("favorites_servers_list",server=x.server) or 100)
         else:
-            servers_list = sorted(servers_list, key = lambda x: config.get_setting("white_list",server=x) or 100)
+            servers_list = sorted(servers_list, key = lambda x: config.get_setting("favorites_servers_list",server=x) or 100)
     return servers_list
 
     
 def filter_servers(servers_list):
     """
-    Si esta activada la opcion "Filtrar servidores (Lista Negra)" en la configuracion, elimina de la lista de entrada los
-    servidores incluidos en la Lista Negra.
+    Si esta activada la opcion "Filtrar por servidores" en la configuracion de servidores, elimina de la lista 
+    de entrada los servidores incluidos en la Lista Negra.
     :param servers_list: Listado de servidores para filtrar. Los elementos de la lista servers_list pueden ser strings
     u objetos Item. En cuyo caso es necesario q tengan un atributo item.server del tipo str.
     :return: Lista del mismo tipo de objetos que servers_list filtrada en funcion de la Lista Negra.
     """
     servers_list_filter = []
-    if servers_list:
+    if servers_list and config.get_setting('filter_servers'):
         if isinstance(servers_list[0],Item):
             servers_list_filter = filter(lambda x: not config.get_setting("black_list",server=x.server), servers_list)
         else:
             servers_list_filter = filter(lambda x: not config.get_setting("black_list",server=x), servers_list)
             
         # Si no hay enlaces despues de filtrarlos
-        if not servers_list_filter and platformtools.dialog_yesno("Filtrar servidores (Lista Negra)",
+        if servers_list_filter or not platformtools.dialog_yesno("Filtrar servidores (Lista Negra)",
                                                                   "Todos los enlaces disponibles pertenecen a servidores incluidos en su Lista Negra.",
                                                                   "¿Desea mostrar estos enlaces?"):
-            return servers_list
-    return servers_list_filter
+            servers_list = servers_list_filter
+
+    return servers_list
 
 
 def xml2dict(file = None, xmldata = None):

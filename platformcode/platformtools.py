@@ -330,12 +330,6 @@ def set_context_commands(item, parent_item):
         if type(command) == str:
             if command == "no_context":
                 return []
-            if command == "buscar_trailer" or item.action == "findvideos":
-                context_commands.append(("cerca Trailer", "XBMC.RunPlugin(%s?%s)" % (sys.argv[0], item.clone(
-                    channel="trailertools",
-                    action="buscartrailer",
-                    contextual=True
-                ).tourl())))
 
         # Formato dict
         if type(command) == dict:
@@ -455,6 +449,11 @@ def set_context_commands(item, parent_item):
         if parent_item.channel not in ["configuracion", "novedades", "buscador"]:
             context_commands.append(("Configurazione", "XBMC.Container.Update(%s?%s)" %
                                      (sys.argv[0], Item(channel="configuracion", action="mainlist").tourl())))
+
+        # Buscar Trailer
+        if item.action == "findvideos" or "buscar_trailer" in context:
+            context_commands.append(("Cerca Trailer", "XBMC.RunPlugin(%s?%s)" % (sys.argv[0], item.clone(
+                                     channel="trailertools", action="buscartrailer", contextual=True).tourl())))
 
     # Añadir SuperFavourites al menu contextual (1.0.53 o superior necesario)
     sf_file_path = xbmc.translatePath("special://home/addons/plugin.program.super.favourites/LaunchSFMenu.py")
@@ -1044,7 +1043,7 @@ def play_torrent(item, xlistitem, mediaurl):
 
                 progreso.update(s.buffer, txt, txt2, txt3)
                 time.sleep(0.5)
-                
+
                 if progreso.iscanceled():
                   progreso.close()
                   if s.buffer == 100:

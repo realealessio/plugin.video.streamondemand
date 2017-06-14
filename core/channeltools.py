@@ -69,6 +69,7 @@ def get_channel_parameters(channel_name):
         channel_parameters["active"] = str_to_bool(scrapertools.find_single_match(data, "<active>([^<]*)</active>"))
         channel_parameters["adult"] = str_to_bool(scrapertools.find_single_match(data, "<adult>([^<]*)</adult>"))
         channel_parameters["language"] = scrapertools.find_single_match(data, "<language>([^<]*)</language>")
+        channel_parameters["version"] = scrapertools.find_single_match(data, "<version>([^<]*)</version>")
 
         # Imagenes: se admiten url y archivos locales dentro de "resources/images"
         channel_parameters["thumbnail"] = scrapertools.find_single_match(data, "<thumbnail>([^<]*)</thumbnail>")
@@ -115,6 +116,7 @@ def get_channel_parameters(channel_name):
                 channel_parameters["has_settings"] = True
                 break
 
+        # Inicio - condiciones para mostrar canal compatible
         python_condition = scrapertools.find_single_match(data, "<python>([^<]*)</python>")
         if python_condition:
             import sys
@@ -123,11 +125,29 @@ def get_channel_parameters(channel_name):
                 return tuple(map(int, (v.split("."))))
 
             if sys.version_info < versiontuple(python_condition):
-                channel_parameters["compatible"] = False
+                python_compatible = False
             else:
-                channel_parameters["compatible"] = True
+                python_compatible = True
         else:
-            channel_parameters["compatible"] = True
+            python_compatible = True
+
+        addon_version_condition = scrapertools.find_single_match(data, "<addon_version>([^<]*)</addon_version>")
+        if addon_version_condition:
+            import versiontools
+            addon_version = int(addon_version_condition.replace(".", "").ljust(len(str(
+                versiontools.get_current_plugin_version())), '0'))
+            if versiontools.get_current_plugin_version() < addon_version:
+                addon_version_compatible = False
+            else:
+                addon_version_compatible = True
+        else:
+            addon_version_compatible = True
+
+        channel_parameters["compatible"] = True
+
+        if not python_compatible or not addon_version_compatible:
+            channel_parameters["compatible"] = False
+        # Fin - condiciones para mostrar canal compatible
 
         logger.info(channel_name+" -> "+repr(channel_parameters))
 
@@ -139,6 +159,7 @@ def get_channel_parameters(channel_name):
         channel_parameters["update_url"] = DEFAULT_UPDATE_URL
 
     return channel_parameters
+
 
 
 def get_channel_json(channel_name):
@@ -228,7 +249,7 @@ def get_channel_setting(name, channel):
                 dict_settings = dict_file['settings']
         except EnvironmentError:
             logger.error("ERROR al leer el archivo: %s" % file_settings)
-
+    
     if not dict_settings or name not in dict_settings:
         # Obtenemos controles del archivo ../channels/channel.xml
         try:
@@ -312,13 +333,10 @@ def set_channel_setting(name, value, channel):
 def get_channel_module(channel_name, package="channels"):
     # Sustituye al que hay en servertools.py ...
     # ...pero añade la posibilidad de incluir un paquete diferente de "channels"
-    if not package.endswith('.'):
-        package += '.'
-    logger.info("Importando " + package + channel_name)
-    channels_module = __import__(package + channel_name)
-    channel_module = getattr(channels_module, channel_name)
-    logger.info("Importado " + package + channel_name)
-
+    if not "." in channel_name:
+      channel_module = __import__('%s.%s' % (package,channel_name), None, None, ['%s.%s' % (package,channel_name)])
+    else:
+      channel_module = __import__(channel_name, None, None, [channel_name])
     return channel_module
 
 
