@@ -23,10 +23,10 @@ __language__ = "IT"
 
 DEBUG = config.get_setting("debug")
 
-host = "http://filmperevolvere.pcriot.com"
+host = "https://filmperevolvere.it"
 
 headers = [
-    ['User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0'],
+    ['User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'],
     ['Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'],
     ['Accept-Encoding', 'gzip, deflate'],
     ['Accept-Language', 'en-US,en;q=0.5'],
