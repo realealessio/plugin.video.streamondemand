@@ -359,7 +359,7 @@ def episodios(item):
 def episodios_serie(item):
     def load_episodios(html, item, itemlist, lang_title):
         # for data in scrapertools.decodeHtmlentities(html).splitlines():
-        patron = '((?:.*?<a href=".*?"[^=]+="_blank">.*?<\/a>)+)'
+        patron = '((?:.*?<a href=".*?".*target="_blank".*>.*?<\/a>)+)'
         matches = re.compile(patron).findall(html)
         for data in matches:
             # Extrae las entradas
